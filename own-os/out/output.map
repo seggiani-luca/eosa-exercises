@@ -1,0 +1,112 @@
+
+Merging object attributes
+
+
+There are no discarded input sections
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x00000000         0x00400000         xr
+RAM              0x20000000         0x00400000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD /usr/lib/gcc/arm-none-eabi/16.2.0/thumb/v7-m/nofp/libgcc.a
+LOAD out/src/kernel/startup/startup.o
+LOAD out/src/kernel/serial/serial.o
+LOAD out/src/kernel/kernel.o
+                0x20400000                        _estack = (ORIGIN (RAM) + LENGTH (RAM))
+                0x00001000                        _stack_size = 0x1000
+                0x203ff000                        _stack_limit = (_estack - _stack_size)
+
+.isr_vector     0x00000000       0x40
+                0x00000000                        . = ALIGN (0x4)
+ *(.isr_vector)
+ .isr_vector    0x00000000       0x40 out/src/kernel/startup/startup.o
+                0x00000040                        . = ALIGN (0x4)
+
+.text           0x00000040      0x308
+                0x00000040                        . = ALIGN (0x4)
+ *(.text*)
+ .text          0x00000040       0x44 out/src/kernel/startup/startup.o
+                0x00000040                Reset_Handler
+                0x0000006c                Default_Handler
+ .text          0x00000084      0x2b0 out/src/kernel/serial/serial.o
+                0x00000084                sh_putc
+                0x000000a0                sh_puts
+                0x000000b8                sh_putu
+                0x00000134                sh_puti
+                0x00000164                sh_printf
+                0x00000220                sh_getc
+                0x00000232                sh_gets
+                0x000002bc                atou
+                0x00000300                atoi
+ .text          0x00000334        0xe out/src/kernel/kernel.o
+                0x00000334                main
+ *(.rodata*)
+ *fill*         0x00000342        0x2 
+ .rodata        0x00000344        0x4 out/src/kernel/serial/serial.o
+                0x00000348                        . = ALIGN (0x4)
+                0x00000348                        _etext = .
+                0x00000348                        _sidata = LOADADDR (.data)
+
+.glue_7         0x00000348        0x0
+ .glue_7        0x00000348        0x0 linker stubs
+
+.glue_7t        0x00000348        0x0
+ .glue_7t       0x00000348        0x0 linker stubs
+
+.vfp11_veneer   0x00000348        0x0
+ .vfp11_veneer  0x00000348        0x0 linker stubs
+
+.v4_bx          0x00000348        0x0
+ .v4_bx         0x00000348        0x0 linker stubs
+
+.iplt           0x00000348        0x0
+ .iplt          0x00000348        0x0 out/src/kernel/startup/startup.o
+
+.rel.dyn        0x00000348        0x0
+ .rel.iplt      0x00000348        0x0 out/src/kernel/startup/startup.o
+
+.data           0x20000000        0x0 load address 0x00000348
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _sdata = .
+ *(.data*)
+ .data          0x20000000        0x0 out/src/kernel/startup/startup.o
+ .data          0x20000000        0x0 out/src/kernel/serial/serial.o
+ .data          0x20000000        0x0 out/src/kernel/kernel.o
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _edata = .
+
+.igot.plt       0x20000000        0x0 load address 0x00000348
+ .igot.plt      0x20000000        0x0 out/src/kernel/startup/startup.o
+
+.bss            0x20000000        0x0 load address 0x00000348
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _sbss = .
+ *(.bss*)
+ .bss           0x20000000        0x0 out/src/kernel/startup/startup.o
+ .bss           0x20000000        0x0 out/src/kernel/serial/serial.o
+ .bss           0x20000000        0x0 out/src/kernel/kernel.o
+ *(COMMON)
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _ebss = .
+OUTPUT(out/kernel.axf elf32-littlearm)
+LOAD linker stubs
+
+.ARM.attributes
+                0x00000000       0x29
+ .ARM.attributes
+                0x00000000       0x1b out/src/kernel/startup/startup.o
+ .ARM.attributes
+                0x0000001b       0x2d out/src/kernel/serial/serial.o
+ .ARM.attributes
+                0x00000048       0x2d out/src/kernel/kernel.o
+
+.comment        0x00000000       0x1e
+ .comment       0x00000000       0x1e out/src/kernel/serial/serial.o
+                                 0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 out/src/kernel/kernel.o
+                                 0x1f (size before relaxing)
