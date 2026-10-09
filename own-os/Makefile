@@ -13,16 +13,28 @@ BIN       := $(OUT)/kernel.axf
 
 # tools
 CC     := arm-none-eabi-gcc
-CFLAGS := -mthumb -mcpu=cortex-m3 -nostartfiles -ffreestanding -std=gnu17
+CFLAGS := -mthumb -mcpu=cortex-m3 -nostartfiles -ffreestanding -std=gnu17 -g
+
 LFLAGS := -T $(LSCRIPT)
 LFLAGS += -Xlinker -Map=$(OUT)/output.map -nostdlib -lgcc
-QEMU   := qemu-system-arm
-QFLAGS := -machine mps2-an385 \
-          -monitor null \
-          -nographic \
-		  -serial stdio 
 
-.PHONY: all clean run debug
+QEMU   := qemu-system-arm
+QFLAGS_UART := -machine mps2-an385 \
+               -monitor null \
+               -nographic \
+               -serial stdio
+QFLAGS_SHST := -machine mps2-an385 \
+               -monitor null \
+               -nographic \
+               -chardev stdio,id=stdio0 \
+               -semihosting-config enable=on,target=native,chardev=stdio0 \
+               -serial none
+
+QFLAGS := $(QFLAGS_UART)
+
+GDB := arm-none-eabi-gdb
+
+.PHONY: all clean run debug format
 
 all: $(BIN)
 
@@ -43,5 +55,17 @@ $(OUT):
 run: $(BIN)
 	$(QEMU) $(QFLAGS) -kernel $(BIN)
 
+debug: $(BIN)
+	$(QEMU) $(QFLAGS) -kernel $(BIN) -S -gdb tcp::1234
+
+gdb:
+	$(GDB) $(BIN) -ex 'target remote localhost:1234'
+
 clean:
 	rm -rf $(OUT)
+
+format:
+	find . -type f \( \
+		-name '*.c' -o \
+		-name '*.h' \
+	\) -exec clang-format -i {} +

@@ -1,115 +1,43 @@
-#include "../include/semihost.h"
-#include <stdarg.h>
+#include "../include/serial.h"
+#include "../include/stdio.h"
 
-void sh_putc(char c) {
-	sh_call(SYS_WRITEC, &c);
+char_driver uart_driver = {
+	.init = uart_init,
+	.putc = uart_putc,
+	.getc = uart_getc,
+};
+
+void uart_init() {
+	// set baud divider
+	CMSDK_UART0->BAUDDIV = 16;
+
+	// enable UART
+	CMSDK_UART0->CTRL = UART_CTRL_TXEN | UART_CTRL_RXEN;
 }
 
-void sh_puts(const char* s) {
-	sh_call(SYS_WRITE0, (char*)s);
+void uart_putc(char c) {
+	// poll
+	while (CMSDK_UART0->STATE & UART_STATE_TXBF)
+		;
+
+	// send byte
+	CMSDK_UART0->DATA = (uint32_t)(unsigned char)c;
 }
 
-void sh_putu(unsigned int n) {
-	char buf[16];
-	int i = 0;
+int uart_getc() {
+	// poll
+	while ((CMSDK_UART0->STATE & UART_STATE_RXBF) == 0)
+		;
 
-	do {
-		int r = n % 10;
-		buf[i++] = r + '0';
-
-		n = n / 10;
-	} while(n != 0);
-
-	for(int j = i - 1; j >= 0; j--) sh_putc(buf[j]);
+	// receive byte
+	return (int)(CMSDK_UART0->DATA & 0xFF);
 }
 
-void sh_puti(int n) {
-	if(n < 0) {
-		sh_putc('-');
-		sh_putu(-(unsigned int)n);
-	} else {
-		sh_putu((unsigned int)n);
-	}
-}
-
-void sh_printf(const char* fmt, ...) {
+void kprintf(const char *fmt, ...) {
 	va_list ap;
 	va_start(ap, fmt);
 
-	char c;
-	while((c = *fmt)) {
-		fmt++;
-		
-		if(c != '%') {
-			sh_putc(c);
-			continue;
-		}
-
-        switch (*fmt++) {
-			case 'c':
-				sh_putc(va_arg(ap, int));
-				break;
-
-			case 's':
-				sh_puts(va_arg(ap, const char *));
-				break;
-
-			case 'd':
-			case 'i':
-				sh_puti(va_arg(ap, int));
-				break;
-
-			case 'u':
-				sh_putu(va_arg(ap, unsigned int));
-				break;
-
-			case '%':
-				sh_putc('%');
-				break;
-		}
-	}
+	io_vprintf(&uart_driver, fmt, ap);
 
 	va_end(ap);
-}
-
-int sh_getc() {
-	return sh_call(SYS_READC, 0);
-}
-
-int sh_gets(char* buf, int siz) {
-	int i = 0;
-
-	while(i < siz - 1) {
-		int c = sh_getc();
-
-		if(c == '\r' || c == '\n') break;
-		
-		if(c == '\b' || c == 127) {
-			if(i <= 0) continue;
-
-			i--;
-			sh_puts("\b \b");
-			continue;
-		}
-
-		buf[i++] = c;
-		sh_putc(c);
-	}
-
-	buf[i] = '\0';
-
-	sh_putc('\n');
-	return i;
-}
-
-int atou(const char* s) {
-	unsigned int n = 0;
-
-	while(*s >= '0' && *s <= '9') n = n * 10 + (*s++ - '0');
-	return n;
-}
-
-int atoi(const char* s) {
-	if(*s == '-') return -atou(++s);
-	else return atou(s);
 }

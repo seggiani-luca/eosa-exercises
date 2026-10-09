@@ -14,99 +14,362 @@ RAM              0x20000000         0x00400000         xrw
 Linker script and memory map
 
 LOAD /usr/lib/gcc/arm-none-eabi/16.2.0/thumb/v7-m/nofp/libgcc.a
+LOAD out/src/kernel/irq/irq_asm.o
+LOAD out/src/kernel/syscall/syscall_asm.o
+LOAD out/src/kernel/semihost/semihost_asm.o
+LOAD out/src/kernel/control/control_asm.o
 LOAD out/src/kernel/startup/startup.o
+LOAD out/src/user/lib.o
+LOAD out/src/user/main.o
 LOAD out/src/kernel/serial/serial.o
 LOAD out/src/kernel/kernel.o
+LOAD out/src/kernel/stdio/stdio.o
+LOAD out/src/kernel/systick/systick.o
+LOAD out/src/kernel/handler/handler.o
+LOAD out/src/kernel/syscall/syscall.o
+LOAD out/src/kernel/semihost/semihost.o
                 0x20400000                        _estack = (ORIGIN (RAM) + LENGTH (RAM))
                 0x00001000                        _stack_size = 0x1000
                 0x203ff000                        _stack_limit = (_estack - _stack_size)
 
-.isr_vector     0x00000000       0x40
+.isr_vector     0x00000000       0xc0
                 0x00000000                        . = ALIGN (0x4)
  *(.isr_vector)
- .isr_vector    0x00000000       0x40 out/src/kernel/startup/startup.o
-                0x00000040                        . = ALIGN (0x4)
+ .isr_vector    0x00000000       0xc0 out/src/kernel/startup/startup.o
+                0x000000c0                        . = ALIGN (0x4)
 
-.text           0x00000040      0x308
-                0x00000040                        . = ALIGN (0x4)
+.text           0x000000c0      0xb34
+                0x000000c0                        . = ALIGN (0x4)
  *(.text*)
- .text          0x00000040       0x44 out/src/kernel/startup/startup.o
-                0x00000040                Reset_Handler
-                0x0000006c                Default_Handler
- .text          0x00000084      0x2b0 out/src/kernel/serial/serial.o
-                0x00000084                sh_putc
-                0x000000a0                sh_puts
-                0x000000b8                sh_putu
-                0x00000134                sh_puti
-                0x00000164                sh_printf
-                0x00000220                sh_getc
-                0x00000232                sh_gets
-                0x000002bc                atou
-                0x00000300                atoi
- .text          0x00000334        0xe out/src/kernel/kernel.o
-                0x00000334                main
+ .text          0x000000c0        0xe out/src/kernel/irq/irq_asm.o
+                0x000000c0                irq_save
+                0x000000c8                irq_restore
+ .text          0x000000ce       0x1a out/src/kernel/syscall/syscall_asm.o
+                0x000000ce                SVC_Handler
+ .text          0x000000e8        0x4 out/src/kernel/semihost/semihost_asm.o
+                0x000000e8                shst_call
+ .text          0x000000ec       0x12 out/src/kernel/control/control_asm.o
+                0x000000ec                priv_down
+ *fill*         0x000000fe        0x2 
+ .text          0x00000100       0x40 out/src/kernel/startup/startup.o
+                0x00000100                Reset_Handler
+ .text          0x00000140       0xbc out/src/user/lib.o
+                0x00000140                fputc
+                0x00000158                fgetc
+                0x0000016e                fputs
+                0x00000184                fputu
+                0x0000019a                fputi
+                0x000001b0                fprintf
+                0x000001d2                fgets
+                0x000001ec                tick
+ .text          0x000001fc       0x18 out/src/user/main.o
+                0x000001fc                main
+ .text          0x00000214       0x98 out/src/kernel/serial/serial.o
+                0x00000214                uart_init
+                0x00000230                uart_putc
+                0x0000025c                uart_getc
+                0x00000280                kprintf
+ .text          0x000002ac       0x30 out/src/kernel/kernel.o
+                0x000002ac                kernel_main
+ .text          0x000002dc      0x2cc out/src/kernel/stdio/stdio.o
+                0x000002dc                io_puts
+                0x0000030c                io_putu
+                0x0000038c                io_puti
+                0x000003c4                io_vprintf
+                0x00000484                io_gets
+                0x00000530                atou
+                0x00000574                atoi
+ .text          0x000005a8       0x60 out/src/kernel/systick/systick.o
+                0x000005a8                systick_init
+                0x000005d8                systick_uptime_ms
+                0x000005ec                SysTick_Handler
+ .text          0x00000608      0x158 out/src/kernel/handler/handler.o
+                0x00000608                NMI_Handler
+                0x00000618                HardFault_Handler
+                0x00000678                Memory_Handler
+                0x0000069c                Bus_Handler
+                0x000006ec                Usage_Handler
+                0x00000750                Default_Handler
+ .text          0x00000760      0x2bc out/src/kernel/syscall/syscall.o
+                0x00000760                get_char_dev
+                0x0000079c                putc_syscall
+                0x000007d0                getc_syscall
+                0x000007fc                puts_syscall
+                0x0000082c                putu_syscall
+                0x0000085c                puti_syscall
+                0x0000088c                vprintf_syscall
+                0x000008c2                gets_syscall
+                0x000008f6                tick_syscall
+                0x00000904                dispatch_syscall
+ .text          0x00000a1c       0x2e out/src/kernel/semihost/semihost.o
+                0x00000a1c                shst_putc
+                0x00000a38                shst_getc
  *(.rodata*)
- *fill*         0x00000342        0x2 
- .rodata        0x00000344        0x4 out/src/kernel/serial/serial.o
-                0x00000348                        . = ALIGN (0x4)
-                0x00000348                        _etext = .
-                0x00000348                        _sidata = LOADADDR (.data)
+ *fill*         0x00000a4a        0x2 
+ .rodata        0x00000a4c       0x17 out/src/user/main.o
+ *fill*         0x00000a63        0x1 
+ .rodata        0x00000a64       0x33 out/src/kernel/kernel.o
+ *fill*         0x00000a97        0x1 
+ .rodata        0x00000a98        0x8 out/src/kernel/stdio/stdio.o
+ .rodata        0x00000aa0      0x121 out/src/kernel/handler/handler.o
+ *fill*         0x00000bc1        0x3 
+ .rodata        0x00000bc4       0x30 out/src/kernel/syscall/syscall.o
+                0x00000bf4                        . = ALIGN (0x4)
+                0x00000bf4                        _etext = .
+                0x00000bf4                        _sidata = LOADADDR (.data)
 
-.glue_7         0x00000348        0x0
- .glue_7        0x00000348        0x0 linker stubs
+.glue_7         0x00000bf4        0x0
+ .glue_7        0x00000bf4        0x0 linker stubs
 
-.glue_7t        0x00000348        0x0
- .glue_7t       0x00000348        0x0 linker stubs
+.glue_7t        0x00000bf4        0x0
+ .glue_7t       0x00000bf4        0x0 linker stubs
 
-.vfp11_veneer   0x00000348        0x0
- .vfp11_veneer  0x00000348        0x0 linker stubs
+.vfp11_veneer   0x00000bf4        0x0
+ .vfp11_veneer  0x00000bf4        0x0 linker stubs
 
-.v4_bx          0x00000348        0x0
- .v4_bx         0x00000348        0x0 linker stubs
+.v4_bx          0x00000bf4        0x0
+ .v4_bx         0x00000bf4        0x0 linker stubs
 
-.iplt           0x00000348        0x0
- .iplt          0x00000348        0x0 out/src/kernel/startup/startup.o
+.iplt           0x00000bf4        0x0
+ .iplt          0x00000bf4        0x0 out/src/kernel/syscall/syscall_asm.o
 
-.rel.dyn        0x00000348        0x0
- .rel.iplt      0x00000348        0x0 out/src/kernel/startup/startup.o
+.rel.dyn        0x00000bf4        0x0
+ .rel.iplt      0x00000bf4        0x0 out/src/kernel/syscall/syscall_asm.o
 
-.data           0x20000000        0x0 load address 0x00000348
+.data           0x20000000       0x18 load address 0x00000bf4
                 0x20000000                        . = ALIGN (0x4)
                 0x20000000                        _sdata = .
  *(.data*)
+ .data          0x20000000        0x0 out/src/kernel/irq/irq_asm.o
+ .data          0x20000000        0x0 out/src/kernel/syscall/syscall_asm.o
+ .data          0x20000000        0x0 out/src/kernel/semihost/semihost_asm.o
+ .data          0x20000000        0x0 out/src/kernel/control/control_asm.o
  .data          0x20000000        0x0 out/src/kernel/startup/startup.o
- .data          0x20000000        0x0 out/src/kernel/serial/serial.o
- .data          0x20000000        0x0 out/src/kernel/kernel.o
-                0x20000000                        . = ALIGN (0x4)
-                0x20000000                        _edata = .
+ .data          0x20000000        0x0 out/src/user/lib.o
+ .data          0x20000000        0x0 out/src/user/main.o
+ .data          0x20000000        0xc out/src/kernel/serial/serial.o
+                0x20000000                uart_driver
+ .data          0x2000000c        0x0 out/src/kernel/kernel.o
+ .data          0x2000000c        0x0 out/src/kernel/stdio/stdio.o
+ .data          0x2000000c        0x0 out/src/kernel/systick/systick.o
+ .data          0x2000000c        0x0 out/src/kernel/handler/handler.o
+ .data          0x2000000c        0x0 out/src/kernel/syscall/syscall.o
+ .data          0x2000000c        0xc out/src/kernel/semihost/semihost.o
+                0x2000000c                shst_driver
+                0x20000018                        . = ALIGN (0x4)
+                0x20000018                        _edata = .
 
-.igot.plt       0x20000000        0x0 load address 0x00000348
- .igot.plt      0x20000000        0x0 out/src/kernel/startup/startup.o
+.igot.plt       0x20000018        0x0 load address 0x00000c0c
+ .igot.plt      0x20000018        0x0 out/src/kernel/syscall/syscall_asm.o
 
-.bss            0x20000000        0x0 load address 0x00000348
-                0x20000000                        . = ALIGN (0x4)
-                0x20000000                        _sbss = .
+.bss            0x20000018        0x4 load address 0x00000c0c
+                0x20000018                        . = ALIGN (0x4)
+                0x20000018                        _sbss = .
  *(.bss*)
- .bss           0x20000000        0x0 out/src/kernel/startup/startup.o
- .bss           0x20000000        0x0 out/src/kernel/serial/serial.o
- .bss           0x20000000        0x0 out/src/kernel/kernel.o
+ .bss           0x20000018        0x0 out/src/kernel/irq/irq_asm.o
+ .bss           0x20000018        0x0 out/src/kernel/syscall/syscall_asm.o
+ .bss           0x20000018        0x0 out/src/kernel/semihost/semihost_asm.o
+ .bss           0x20000018        0x0 out/src/kernel/control/control_asm.o
+ .bss           0x20000018        0x0 out/src/kernel/startup/startup.o
+ .bss           0x20000018        0x0 out/src/user/lib.o
+ .bss           0x20000018        0x0 out/src/user/main.o
+ .bss           0x20000018        0x0 out/src/kernel/serial/serial.o
+ .bss           0x20000018        0x0 out/src/kernel/kernel.o
+ .bss           0x20000018        0x0 out/src/kernel/stdio/stdio.o
+ .bss           0x20000018        0x4 out/src/kernel/systick/systick.o
+ .bss           0x2000001c        0x0 out/src/kernel/handler/handler.o
+ .bss           0x2000001c        0x0 out/src/kernel/syscall/syscall.o
+ .bss           0x2000001c        0x0 out/src/kernel/semihost/semihost.o
  *(COMMON)
-                0x20000000                        . = ALIGN (0x4)
-                0x20000000                        _ebss = .
+                0x2000001c                        . = ALIGN (0x4)
+                0x2000001c                        _ebss = .
 OUTPUT(out/kernel.axf elf32-littlearm)
 LOAD linker stubs
 
 .ARM.attributes
                 0x00000000       0x29
  .ARM.attributes
-                0x00000000       0x1b out/src/kernel/startup/startup.o
+                0x00000000       0x1b out/src/kernel/irq/irq_asm.o
  .ARM.attributes
-                0x0000001b       0x2d out/src/kernel/serial/serial.o
+                0x0000001b       0x1b out/src/kernel/syscall/syscall_asm.o
  .ARM.attributes
-                0x00000048       0x2d out/src/kernel/kernel.o
+                0x00000036       0x1b out/src/kernel/semihost/semihost_asm.o
+ .ARM.attributes
+                0x00000051       0x1b out/src/kernel/control/control_asm.o
+ .ARM.attributes
+                0x0000006c       0x1b out/src/kernel/startup/startup.o
+ .ARM.attributes
+                0x00000087       0x2d out/src/user/lib.o
+ .ARM.attributes
+                0x000000b4       0x2d out/src/user/main.o
+ .ARM.attributes
+                0x000000e1       0x2d out/src/kernel/serial/serial.o
+ .ARM.attributes
+                0x0000010e       0x2d out/src/kernel/kernel.o
+ .ARM.attributes
+                0x0000013b       0x2d out/src/kernel/stdio/stdio.o
+ .ARM.attributes
+                0x00000168       0x2d out/src/kernel/systick/systick.o
+ .ARM.attributes
+                0x00000195       0x2d out/src/kernel/handler/handler.o
+ .ARM.attributes
+                0x000001c2       0x2d out/src/kernel/syscall/syscall.o
+ .ARM.attributes
+                0x000001ef       0x2d out/src/kernel/semihost/semihost.o
 
 .comment        0x00000000       0x1e
- .comment       0x00000000       0x1e out/src/kernel/serial/serial.o
+ .comment       0x00000000       0x1e out/src/user/lib.o
+                                 0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 out/src/user/main.o
+                                 0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 out/src/kernel/serial/serial.o
                                  0x1f (size before relaxing)
  .comment       0x0000001e        0x0 out/src/kernel/kernel.o
                                  0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 out/src/kernel/stdio/stdio.o
+                                 0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 out/src/kernel/systick/systick.o
+                                 0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 out/src/kernel/handler/handler.o
+                                 0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 out/src/kernel/syscall/syscall.o
+                                 0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 out/src/kernel/semihost/semihost.o
+                                 0x1f (size before relaxing)
+
+.debug_line     0x00000000      0xc62
+ .debug_line    0x00000000       0x4b out/src/kernel/irq/irq_asm.o
+ .debug_line    0x0000004b       0x51 out/src/kernel/syscall/syscall_asm.o
+ .debug_line    0x0000009c       0x48 out/src/kernel/semihost/semihost_asm.o
+ .debug_line    0x000000e4       0x4b out/src/kernel/control/control_asm.o
+ .debug_line    0x0000012f       0x63 out/src/kernel/startup/startup.o
+ .debug_line    0x00000192       0xf7 out/src/user/lib.o
+ .debug_line    0x00000289       0x86 out/src/user/main.o
+ .debug_line    0x0000030f      0x14f out/src/kernel/serial/serial.o
+ .debug_line    0x0000045e       0x8a out/src/kernel/kernel.o
+ .debug_line    0x000004e8      0x24d out/src/kernel/stdio/stdio.o
+ .debug_line    0x00000735       0xd9 out/src/kernel/systick/systick.o
+ .debug_line    0x0000080e      0x153 out/src/kernel/handler/handler.o
+ .debug_line    0x00000961      0x264 out/src/kernel/syscall/syscall.o
+ .debug_line    0x00000bc5       0x9d out/src/kernel/semihost/semihost.o
+
+.debug_line_str
+                0x00000000       0xc2
+ .debug_line_str
+                0x00000000       0xc2 out/src/kernel/irq/irq_asm.o
+                                 0x40 (size before relaxing)
+ .debug_line_str
+                0x000000c2        0x0 out/src/kernel/syscall/syscall_asm.o
+                                 0x48 (size before relaxing)
+ .debug_line_str
+                0x000000c2        0x0 out/src/kernel/semihost/semihost_asm.o
+                                 0x4a (size before relaxing)
+ .debug_line_str
+                0x000000c2        0x0 out/src/kernel/control/control_asm.o
+                                 0x48 (size before relaxing)
+ .debug_line_str
+                0x000000c2        0x0 out/src/kernel/startup/startup.o
+                                 0x44 (size before relaxing)
+
+.debug_info     0x00000000     0x134a
+ .debug_info    0x00000000       0x24 out/src/kernel/irq/irq_asm.o
+ .debug_info    0x00000024       0x24 out/src/kernel/syscall/syscall_asm.o
+ .debug_info    0x00000048       0x24 out/src/kernel/semihost/semihost_asm.o
+ .debug_info    0x0000006c       0x24 out/src/kernel/control/control_asm.o
+ .debug_info    0x00000090       0x24 out/src/kernel/startup/startup.o
+ .debug_info    0x000000b4      0x2b4 out/src/user/lib.o
+ .debug_info    0x00000368       0x91 out/src/user/main.o
+ .debug_info    0x000003f9      0x231 out/src/kernel/serial/serial.o
+ .debug_info    0x0000062a       0xdd out/src/kernel/kernel.o
+ .debug_info    0x00000707      0x2d8 out/src/kernel/stdio/stdio.o
+ .debug_info    0x000009df      0x113 out/src/kernel/systick/systick.o
+ .debug_info    0x00000af2      0x1de out/src/kernel/handler/handler.o
+ .debug_info    0x00000cd0      0x4e3 out/src/kernel/syscall/syscall.o
+ .debug_info    0x000011b3      0x197 out/src/kernel/semihost/semihost.o
+
+.debug_abbrev   0x00000000      0xab8
+ .debug_abbrev  0x00000000       0x14 out/src/kernel/irq/irq_asm.o
+ .debug_abbrev  0x00000014       0x14 out/src/kernel/syscall/syscall_asm.o
+ .debug_abbrev  0x00000028       0x14 out/src/kernel/semihost/semihost_asm.o
+ .debug_abbrev  0x0000003c       0x14 out/src/kernel/control/control_asm.o
+ .debug_abbrev  0x00000050       0x14 out/src/kernel/startup/startup.o
+ .debug_abbrev  0x00000064      0x13b out/src/user/lib.o
+ .debug_abbrev  0x0000019f       0x9a out/src/user/main.o
+ .debug_abbrev  0x00000239      0x180 out/src/kernel/serial/serial.o
+ .debug_abbrev  0x000003b9       0xa6 out/src/kernel/kernel.o
+ .debug_abbrev  0x0000045f      0x170 out/src/kernel/stdio/stdio.o
+ .debug_abbrev  0x000005cf       0xd3 out/src/kernel/systick/systick.o
+ .debug_abbrev  0x000006a2      0x104 out/src/kernel/handler/handler.o
+ .debug_abbrev  0x000007a6      0x1e7 out/src/kernel/syscall/syscall.o
+ .debug_abbrev  0x0000098d      0x12b out/src/kernel/semihost/semihost.o
+
+.debug_aranges  0x00000000      0x1c0
+ .debug_aranges
+                0x00000000       0x20 out/src/kernel/irq/irq_asm.o
+ .debug_aranges
+                0x00000020       0x20 out/src/kernel/syscall/syscall_asm.o
+ .debug_aranges
+                0x00000040       0x20 out/src/kernel/semihost/semihost_asm.o
+ .debug_aranges
+                0x00000060       0x20 out/src/kernel/control/control_asm.o
+ .debug_aranges
+                0x00000080       0x20 out/src/kernel/startup/startup.o
+ .debug_aranges
+                0x000000a0       0x20 out/src/user/lib.o
+ .debug_aranges
+                0x000000c0       0x20 out/src/user/main.o
+ .debug_aranges
+                0x000000e0       0x20 out/src/kernel/serial/serial.o
+ .debug_aranges
+                0x00000100       0x20 out/src/kernel/kernel.o
+ .debug_aranges
+                0x00000120       0x20 out/src/kernel/stdio/stdio.o
+ .debug_aranges
+                0x00000140       0x20 out/src/kernel/systick/systick.o
+ .debug_aranges
+                0x00000160       0x20 out/src/kernel/handler/handler.o
+ .debug_aranges
+                0x00000180       0x20 out/src/kernel/syscall/syscall.o
+ .debug_aranges
+                0x000001a0       0x20 out/src/kernel/semihost/semihost.o
+
+.debug_str      0x00000000      0x679
+ .debug_str     0x00000000      0x679 out/src/kernel/irq/irq_asm.o
+                                 0x4c (size before relaxing)
+ .debug_str     0x00000679        0x0 out/src/kernel/syscall/syscall_asm.o
+                                 0x54 (size before relaxing)
+ .debug_str     0x00000679        0x0 out/src/kernel/semihost/semihost_asm.o
+                                 0x56 (size before relaxing)
+ .debug_str     0x00000679        0x0 out/src/kernel/control/control_asm.o
+                                 0x54 (size before relaxing)
+ .debug_str     0x00000679        0x0 out/src/kernel/startup/startup.o
+                                 0x50 (size before relaxing)
+ .debug_str     0x00000679        0x0 out/src/user/lib.o
+                                0x163 (size before relaxing)
+ .debug_str     0x00000679        0x0 out/src/user/main.o
+                                 0xd3 (size before relaxing)
+ .debug_str     0x00000679        0x0 out/src/kernel/serial/serial.o
+                                0x1eb (size before relaxing)
+ .debug_str     0x00000679        0x0 out/src/kernel/kernel.o
+                                0x162 (size before relaxing)
+ .debug_str     0x00000679        0x0 out/src/kernel/stdio/stdio.o
+                                0x12c (size before relaxing)
+ .debug_str     0x00000679        0x0 out/src/kernel/systick/systick.o
+                                0x18e (size before relaxing)
+ .debug_str     0x00000679        0x0 out/src/kernel/handler/handler.o
+                                0x1dd (size before relaxing)
+ .debug_str     0x00000679        0x0 out/src/kernel/syscall/syscall.o
+                                0x2ee (size before relaxing)
+ .debug_str     0x00000679        0x0 out/src/kernel/semihost/semihost.o
+                                0x1ef (size before relaxing)
+
+.debug_frame    0x00000000      0x660
+ .debug_frame   0x00000000      0x154 out/src/user/lib.o
+ .debug_frame   0x00000154       0x2c out/src/user/main.o
+ .debug_frame   0x00000180       0xb4 out/src/kernel/serial/serial.o
+ .debug_frame   0x00000234       0x2c out/src/kernel/kernel.o
+ .debug_frame   0x00000260      0x110 out/src/kernel/stdio/stdio.o
+ .debug_frame   0x00000370       0x70 out/src/kernel/systick/systick.o
+ .debug_frame   0x000003e0       0xc0 out/src/kernel/handler/handler.o
+ .debug_frame   0x000004a0      0x170 out/src/kernel/syscall/syscall.o
+ .debug_frame   0x00000610       0x50 out/src/kernel/semihost/semihost.o
