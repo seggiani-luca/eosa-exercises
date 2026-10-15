@@ -1,22 +1,30 @@
 # sources
-SRC       := src
-SCRIPTS   := $(SRC)/scripts
-LSCRIPT   := $(SCRIPTS)/lscript.ld
-C_SOURCES := $(shell find $(SRC) -name "*.c")
-S_SOURCES := $(shell find $(SRC) -name "*.s")
+SRC          := src
+SCRIPTS      := $(SRC)/scripts
+C_SOURCES    := $(shell find $(SRC) -name "*.c")
+S_SOURCES    := $(shell find $(SRC) -name "*.s") $(shell find $(SRC) -name "*.S")
+PROC_SOURCES := $(SRC)/user/process
+
+# scripts
+KERN_LSCRIPT := $(SCRIPTS)/kern_lscript.ld
+PROC_LSCRIPT := $(SCRIPTS)/proc_lscript.ld
+PROC_SCRIPT  := $(SCRIPTS)/make_procs.py
 
 # objects
-OUT       := out
-C_OBJECTS := $(C_SOURCES:%.c=$(OUT)/%.o)
-S_OBJECTS := $(S_SOURCES:%.s=$(OUT)/%.o)
-BIN       := $(OUT)/kernel.axf
+PROC_HEADER := $(PROC_SOURCES)/process.h
+OUT         := out
+C_OBJECTS   := $(C_SOURCES:%.c=$(OUT)/%.o)
+S_OBJECTS   := $(S_SOURCES:%.s=$(OUT)/%.o)
+BIN         := $(OUT)/kernel.axf
 
 # tools
 CC     := arm-none-eabi-gcc
-CFLAGS := -mthumb -mcpu=cortex-m3 -nostartfiles -ffreestanding -std=gnu17 -g
+CFLAGS := -mthumb -mcpu=cortex-m3 -nostartfiles -ffreestanding -fno-builtin -std=gnu17 -g
 
-LFLAGS := -T $(LSCRIPT)
+LFLAGS := -T $(PROC_LSCRIPT)
 LFLAGS += -Xlinker -Map=$(OUT)/output.map -nostdlib -lgcc
+
+PY     := python
 
 QEMU   := qemu-system-arm
 QFLAGS_UART := -machine mps2-an385 \
@@ -34,11 +42,11 @@ QFLAGS := $(QFLAGS_UART)
 
 GDB := arm-none-eabi-gdb
 
-.PHONY: all clean run debug format
+.PHONY: all clean run debug format attach processes
 
 all: $(BIN)
 
-$(BIN): $(C_OBJECTS) $(S_OBJECTS) 
+$(BIN): processes $(C_OBJECTS) $(S_OBJECTS) 
 	$(CC) $(CFLAGS) $(LFLAGS) $(S_OBJECTS) $(C_OBJECTS) -o $(BIN)
 
 $(OUT)/%.o: %.c
@@ -52,13 +60,16 @@ $(OUT)/%.o: %.s
 $(OUT):
 	mkdir -p $(OUT)
 
+processes:
+	$(PY) $(PROC_SCRIPT) -d $(PROC_SOURCES) -k $(KERN_LSCRIPT) -l $(PROC_LSCRIPT) -o $(PROC_HEADER)
+
 run: $(BIN)
 	$(QEMU) $(QFLAGS) -kernel $(BIN)
 
 debug: $(BIN)
 	$(QEMU) $(QFLAGS) -kernel $(BIN) -S -gdb tcp::1234
 
-gdb:
+attach:
 	$(GDB) $(BIN) -ex 'target remote localhost:1234'
 
 clean:

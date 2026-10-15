@@ -8,3 +8,12 @@ priv_down:
 	msr control, r0
 	isb
 	bx lr
+	
+	.global priv_up 
+	.thumb_func
+priv_up:
+	mrs r0, control 
+	and r0, r0, #0xFE
+	msr control, r0
+	isb
+	bx lr

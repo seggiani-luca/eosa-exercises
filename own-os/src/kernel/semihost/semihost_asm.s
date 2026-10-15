@@ -1,7 +1,7 @@
 .syntax unified
 
-.thumb_func
 .global shst_call
+.thumb_func
 shst_call:
 	bkpt #0xab
 	bx lr

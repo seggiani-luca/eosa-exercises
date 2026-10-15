@@ -2,12 +2,10 @@
 
 .section .text
 
-.extern irq_save
-.extern irq_restore
 .extern dispatch_syscall
 
-.thumb_func
 .global SVC_Handler
+.thumb_func
 SVC_Handler:
 	tst lr, #4
 	ite eq
@@ -19,4 +17,7 @@ SVC_Handler:
 	ldrh r1, [r1]
 	uxtb r1, r1
 
-	b dispatch_syscall
+	mov r2, lr
+
+	bl dispatch_syscall
+	bx r0

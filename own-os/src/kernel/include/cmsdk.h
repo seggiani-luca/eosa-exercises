@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+/* SysTick */
+
 // SysTick typedef
 typedef struct {
 	volatile uint32_t CTRL;	 // control and status
@@ -19,6 +21,8 @@ typedef struct {
 #define SysTick_CTRL_TICKINT (1UL << 1)	   // raise exception on wrap
 #define SysTick_CTRL_CLKSOURCE (1UL << 2)  // core (0) / reference (1)
 #define SysTick_CTRL_COUNTFLAG (1UL << 16) // 1 if the counter wrapped
+
+/* SCB */
 
 // SCB typedef
 typedef struct {
@@ -58,6 +62,8 @@ typedef struct {
 #define SCB_CFSR_INVSTATE (1UL << 17)	// UsageFault: bad EPSR state
 #define SCB_CFSR_DIVBYZERO (1UL << 25)	// UsageFault: divide by zero
 
+/* UART */
+
 // UART typedef
 typedef struct {
 	volatile uint32_t DATA;		 // send/receive buffer
@@ -95,6 +101,8 @@ typedef struct {
 
 #define UART_BAUDDIV (0xFFFFFul << 0) // baud rate divider
 
+/* NVIC */
+
 // NVIC typedef
 typedef struct {
 	volatile uint32_t ISER[8]; // enable IRQ
@@ -112,5 +120,17 @@ typedef struct {
 
 // core NVIC
 #define NVIC ((NVIC_TypeDef *)0xE000E100UL)
+
+// IRQ numbers
+#define UART0RX_IRQn 0	  // UART0 received a byte
+#define UART0TX_IRQn 1	  // UART0 finished sending a byte
+#define UART1RX_IRQn 2	  // UART1 received a byte
+#define UART1TX_IRQn 3	  // UART1 finished sending a byte
+#define UART2RX_IRQn 4	  // UART2 received a byte
+#define UART2TX_IRQn 5	  // UART2 finished sending a byte
+#define TIMER0_IRQn 8	  // APB timer 0 reached zero
+#define TIMER1_IRQn 9	  // APB timer 1 reached zero
+#define DUALTIMER_IRQn 10 // dual timer
+#define UARTOVF_IRQn 12	  // combined UART overflow
 
 #endif

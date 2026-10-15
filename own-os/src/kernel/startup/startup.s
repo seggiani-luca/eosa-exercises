@@ -79,12 +79,6 @@
     .word Default_Handler 
     .word Default_Handler 
 
-.weak UART0RX_Handler
-.thumb_set UART0RX_Handler, Default_Handler
-
-.weak UART0TX_Handler
-.thumb_set UART0TX_Handler, Default_Handler
-
 .weak UART1RX_Handler
 .thumb_set UART1RX_Handler, Default_Handler
 
@@ -111,37 +105,55 @@
 
 .section .text    
 
-.thumb_func
 .global Reset_Handler
+.thumb_func
 Reset_Handler:
 
+// Data_Init
+	ldr r0, =_sdata
+	ldr r1, =_edata
+	ldr r2, =_sidata
+
+	bl Data_Init
+
+// Bss_Init
+    ldr r0, =_sbss
+    ldr r1, =_ebss
+
+	bl Bss_Init
+
+Main_Init:
+    bl kernel_main
+    b .
+
+.global Data_Init
+.thumb_func
 Data_Init:
-    ldr r0, =_sdata
-    ldr r1, =_edata
-    ldr r2, =_sidata
 
 Data_Init_Loop:
     cmp r0, r1
-    beq Bss_Init 
+    beq Data_Init_Done 
 
     ldr r3, [r2], #4
     str r3, [r0], #4
 
     b Data_Init_Loop
 
+Data_Init_Done:
+	bx lr
+
+.global Bss_Init
+.thumb_func
 Bss_Init:
-    ldr r0, =_sbss
-    ldr r1, =_ebss
-    mov r2, #0
+	mov r2, #0
 
 Bss_Init_Loop:
     cmp r0, r1 
-    beq Main_Init
+    beq Bss_Init_Done 
 
     str r2, [r0], #4
 
     b Bss_Init_Loop
 
-Main_Init:
-    bl kernel_main
-    b .
+Bss_Init_Done:
+	bx lr

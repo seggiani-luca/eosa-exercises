@@ -4,8 +4,8 @@
 // character device driver
 typedef struct {
 	void (*init)(void);
-	void (*putc)(char c);
-	int (*getc)(void);
+	unsigned int (*write)(const char *buf, unsigned int len);
+	unsigned int (*read)(char *buf, unsigned int len);
 } char_driver;
 
 #endif

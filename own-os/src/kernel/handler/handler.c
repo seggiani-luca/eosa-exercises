@@ -9,8 +9,8 @@ void NMI_Handler() {
 
 void HardFault_Handler() {
 	kprintf("HardFault\n");
-	kprintf("HFSR: 0x%08x\n", SCB->HFSR);
-	kprintf("CFSR: 0x%08x\n", SCB->CFSR);
+	kprintf("HFSR: %x\n", SCB->HFSR);
+	kprintf("CFSR: %x\n", SCB->CFSR);
 
 	if (SCB->HFSR & SCB_HFSR_VECTTBL)
 		kprintf("vector table read fault\n");
@@ -24,7 +24,7 @@ void HardFault_Handler() {
 
 void Memory_Handler() {
 	kprintf("MemManage fault\n");
-	kprintf("CFSR: 0x%08x\n", SCB->CFSR);
+	kprintf("CFSR: %x\n", SCB->CFSR);
 	while (1)
 		;
 }
@@ -33,7 +33,7 @@ void Bus_Handler() {
 	uint32_t cfsr = SCB->CFSR;
 
 	kprintf("BusFault\n");
-	kprintf("CFSR: 0x%08x\n", cfsr);
+	kprintf("CFSR: %x\n", cfsr);
 
 	if (cfsr & SCB_CFSR_IBUSERR)
 		kprintf("instruction bus error\n");
@@ -49,7 +49,7 @@ void Usage_Handler() {
 	uint32_t cfsr = SCB->CFSR;
 
 	kprintf("UsageFault\n");
-	kprintf("CFSR: 0x%08x\n", cfsr);
+	kprintf("CFSR: %x\n", cfsr);
 
 	if (cfsr & SCB_CFSR_UNDEFINSTR)
 		kprintf("undefined instruction\n");
