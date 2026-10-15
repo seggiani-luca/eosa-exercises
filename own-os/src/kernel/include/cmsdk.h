@@ -133,4 +133,40 @@ typedef struct {
 #define DUALTIMER_IRQn 10 // dual timer
 #define UARTOVF_IRQn 12	  // combined UART overflow
 
+/* MPU */
+
+// MPU typedef
+typedef struct {
+	volatile uint32_t TYPE; // 0x00 how many regions this MPU has (bits 15:8)
+	volatile uint32_t CTRL; // 0x04 control: turn the MPU on or off
+	volatile uint32_t RNR; // 0x08 region number: which region RBAR/RASR talk to
+	volatile uint32_t RBAR; // 0x0C region base address (and region number)
+	volatile uint32_t RASR; // 0x10 region attributes and size
+} MPU_TypeDef;
+
+// core MPU
+#define MPU ((MPU_TypeDef *)0xE000ED90UL)
+
+// MPU registers
+#define MPU_CTRL_ENABLE (1UL << 0)	   // the MPU checks every access
+#define MPU_CTRL_PRIVDEFENA (1UL << 2) // privileged code gets default map
+
+#define MPU_RBAR_REGION_MASK (0xFUL) // bits 3:0: region number
+#define MPU_RBAR_VALID (1UL << 4)	 // write RBAR with the region number
+
+#define MPU_RASR_ENABLE (1UL << 0)			 // this region is active
+#define MPU_RASR_SIZE(n) (((n) - 1UL) << 1)	 // region size = 2^n bytes
+#define MPU_RASR_B (1UL << 16)				 // bufferable
+#define MPU_RASR_C (1UL << 17)				 // cacheable
+#define MPU_RASR_S (1UL << 18)				 // shareable
+#define MPU_RASR_AP(v) ((uint32_t)(v) << 24) // access permissions, 3 bits
+#define MPU_RASR_XN (1UL << 28) // execute never: no instruction fetch here
+
+#define MPU_AP_NO_NO 0UL // 000: privileged: no; unprivileged: no
+#define MPU_AP_RW_NO 1UL // 001: privileged: RW; unprivileged: no
+#define MPU_AP_RW_RO 2UL // 010: privileged: RW; unprivileged: RO
+#define MPU_AP_RW_RW 3UL // 011: privileged: RW; unprivileged: RW
+#define MPU_AP_RO_NO 5UL // 101: privileged: RO; unprivileged: no
+#define MPU_AP_RO_RO 6UL // 110: privileged: RO; unprivileged: RO
+
 #endif

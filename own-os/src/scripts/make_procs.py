@@ -91,7 +91,7 @@ static process process_table[{num_processes}];
 #define NUM_PROCESSES {num_processes}
 
 // initialize process descriptors
-static void init_processes(void) {{
+static void init_process_table(void) {{
 """);
 
     for p in processes:

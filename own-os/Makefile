@@ -40,7 +40,7 @@ QFLAGS_SHST := -machine mps2-an385 \
 
 QFLAGS := $(QFLAGS_UART)
 
-GDB := arm-none-eabi-gdb
+GDB := gdb 
 
 .PHONY: all clean run debug format attach processes
 

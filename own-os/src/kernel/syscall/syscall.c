@@ -1,5 +1,4 @@
 #include "../../syscall.h"
-
 #include "../include/process.h"
 #include "../include/semihost.h"
 #include "../include/serial.h"

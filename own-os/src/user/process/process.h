@@ -44,7 +44,7 @@ static process process_table[2];
 #define NUM_PROCESSES 2
 
 // initialize process descriptors
-static void init_processes(void) {
+static void init_process_table(void) {
     // process_a
     process_table[0].name = "process_a";
     process_table[0].entry = process_a_main;
