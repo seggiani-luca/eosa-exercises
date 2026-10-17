@@ -10,7 +10,7 @@ timer_driver systick_driver = {
 static volatile unsigned int ticks;
 static int period;
 
-void systick_init(void* ctx, int period_ms) {
+void systick_init(void *ctx, int period_ms) {
 	ticks = 0;
 	period = period_ms;
 
@@ -21,6 +21,6 @@ void systick_init(void* ctx, int period_ms) {
 		SysTick_CTRL_ENABLE | SysTick_CTRL_TICKINT | SysTick_CTRL_CLKSOURCE;
 }
 
-unsigned int systick_tick(void* ctx) { return ticks * period; }
+unsigned int systick_tick(void *ctx) { return ticks * period; }
 
 void SysTick_Handler(void) { ticks++; }

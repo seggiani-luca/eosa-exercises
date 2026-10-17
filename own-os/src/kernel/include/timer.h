@@ -4,10 +4,10 @@
 #include "driver.h"
 
 // initialize the timer
-void timer_init(void* ctx, int period_ms);
+void timer_init(void *ctx, int period_ms);
 
 // gets current uptime ms
-unsigned int timer_tick(void* ctx);
+unsigned int timer_tick(void *ctx);
 
 // timer device drivers
 extern timer_driver timer0_driver;

@@ -13,7 +13,7 @@ unsigned int fwrite(int dev, const char *buf, unsigned int len);
 // reads a buffer from a device
 unsigned int fread(int dev, char *buf, unsigned int len);
 
-// gets tick from timer device 
+// gets tick from timer device
 int tick(int dev);
 
 /* format */

@@ -36,16 +36,16 @@ typedef enum {
 int shst_call(int op, void *arg);
 
 // puts a character on the host tty via semihosting
-void shst_putc(void* ctx, char c);
+void shst_putc(void *ctx, char c);
 
 // gets a character from the host tty via semihosting
-int shst_getc(void* ctx);
+int shst_getc(void *ctx);
 
 // writes a buffer to the host tty via semihosting
-unsigned int shst_write(void* ctx, const char *buf, unsigned int len);
+unsigned int shst_write(void *ctx, const char *buf, unsigned int len);
 
 // reads a buffer from the host tty via semihosting
-unsigned int shst_read(void* ctx, char *buf, unsigned int len);
+unsigned int shst_read(void *ctx, char *buf, unsigned int len);
 
 // semihosting device driver
 extern char_driver shst_driver;

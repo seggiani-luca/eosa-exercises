@@ -1,11 +1,12 @@
 #include "../user/process/process.h"
 #include "include/cmsdk.h"
+#include "include/log.h"
 #include "include/memory.h"
 #include "include/serial.h"
 #include "include/systick.h"
 #include "include/timer.h"
+#include "include/watchdog.h"
 #include "include/wfi.h"
-#include "include/log.h"
 
 // initalization routines, in startup
 extern void Data_Init(uint32_t *start, uint32_t *end, const uint32_t *source);
@@ -27,10 +28,13 @@ int kernel_main(void) {
 	timer_init(timer0_driver.ctx, 10);
 	timer_init(timer1_driver.ctx, 2000);
 
-	// init serial interfaces 
+	// init serial interfaces
 	uart_init(uart0_driver.ctx);
 	uart_init(uart1_driver.ctx);
 	uart_init(uart2_driver.ctx);
+
+	// init watchdog
+	watchdog_init(10000);
 
 	// setup MPU
 	mem_init();

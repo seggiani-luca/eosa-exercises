@@ -17,11 +17,11 @@ typedef struct {
 // serial handling block
 typedef struct {
 	// uart
-	CMSDK_UART_TypeDef* uart;
-	
+	CMSDK_UART_TypeDef *uart;
+
 	// transmit IRQ number
 	int tx_irq;
-	
+
 	// receive IRQ number
 	int rx_irq;
 
@@ -40,46 +40,31 @@ typedef struct {
 
 // serial blocks
 static serial_block uart0 = {
-	.uart = CMSDK_UART0,
-	.tx_irq = UART0TX_IRQn,
-	.rx_irq = UART0RX_IRQn
-};
+	.uart = CMSDK_UART0, .tx_irq = UART0TX_IRQn, .rx_irq = UART0RX_IRQn};
 static serial_block uart1 = {
-	.uart = CMSDK_UART1,
-	.tx_irq = UART1TX_IRQn,
-	.rx_irq = UART1RX_IRQn
-};
+	.uart = CMSDK_UART1, .tx_irq = UART1TX_IRQn, .rx_irq = UART1RX_IRQn};
 static serial_block uart2 = {
-	.uart = CMSDK_UART2,
-	.tx_irq = UART2TX_IRQn,
-	.rx_irq = UART2RX_IRQn
-};
+	.uart = CMSDK_UART2, .tx_irq = UART2TX_IRQn, .rx_irq = UART2RX_IRQn};
 
 // drivers
-char_driver uart0_driver = {
-	.init = uart_init,
-	.write = uart_write,
-	.read = uart_read,
-	.putc = uart_putc,
-	.getc = uart_getc,
-	.ctx = &uart0
-};
-char_driver uart1_driver = {
-	.init = uart_init,
-	.write = uart_write,
-	.putc = uart_putc,
-	.getc = uart_getc,
-	.read = uart_read,
-	.ctx = &uart1
-};
-char_driver uart2_driver = {
-	.init = uart_init,
-	.write = uart_write,
-	.putc = uart_putc,
-	.getc = uart_getc,
-	.read = uart_read,
-	.ctx = &uart2
-};
+char_driver uart0_driver = {.init = uart_init,
+							.write = uart_write,
+							.read = uart_read,
+							.putc = uart_putc,
+							.getc = uart_getc,
+							.ctx = &uart0};
+char_driver uart1_driver = {.init = uart_init,
+							.write = uart_write,
+							.putc = uart_putc,
+							.getc = uart_getc,
+							.read = uart_read,
+							.ctx = &uart1};
+char_driver uart2_driver = {.init = uart_init,
+							.write = uart_write,
+							.putc = uart_putc,
+							.getc = uart_getc,
+							.read = uart_read,
+							.ctx = &uart2};
 
 int sbuf_empty(sbuf *b) { return b->head == b->tail; }
 
@@ -96,8 +81,8 @@ void sbuf_push(sbuf *b, char c) {
 	b->head = (b->head + 1) % SERIAL_BUF_SIZE;
 }
 
-void uart_init(void* ctx) {
-	serial_block* bl = ctx;
+void uart_init(void *ctx) {
+	serial_block *bl = ctx;
 
 	// set baud divider
 	bl->uart->BAUDDIV = 16;
@@ -118,9 +103,9 @@ void uart_init(void* ctx) {
 	NVIC->ISER[bl->rx_irq / 32] = 1UL << (bl->rx_irq % 32);
 }
 
-void uart_putc(void* ctx, char c) {
-	serial_block* bl = ctx;
-	
+void uart_putc(void *ctx, char c) {
+	serial_block *bl = ctx;
+
 	// poll
 	while (bl->uart->STATE & UART_STATE_TXBF)
 		;
@@ -129,8 +114,8 @@ void uart_putc(void* ctx, char c) {
 	bl->uart->DATA = (uint32_t)(unsigned char)c;
 }
 
-int uart_getc(void* ctx) {
-	serial_block* bl = ctx;
+int uart_getc(void *ctx) {
+	serial_block *bl = ctx;
 
 	// poll
 	while ((bl->uart->STATE & UART_STATE_RXBF) == 0)
@@ -140,9 +125,9 @@ int uart_getc(void* ctx) {
 	return (int)(bl->uart->DATA & 0xFF);
 }
 
-unsigned int uart_write(void* ctx, const char *buf, unsigned int len) {
-	serial_block* bl = ctx;
-	
+unsigned int uart_write(void *ctx, const char *buf, unsigned int len) {
+	serial_block *bl = ctx;
+
 	if (len == 0)
 		return 0;
 	unsigned int accepted = 0;
@@ -172,9 +157,9 @@ unsigned int uart_write(void* ctx, const char *buf, unsigned int len) {
 	return accepted;
 }
 
-unsigned int uart_read(void* ctx, char *buf, unsigned int len) {
-	serial_block* bl = ctx;
-	
+unsigned int uart_read(void *ctx, char *buf, unsigned int len) {
+	serial_block *bl = ctx;
+
 	if (len == 0)
 		return 0;
 	unsigned int accepted = 0;

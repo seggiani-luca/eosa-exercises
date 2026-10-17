@@ -171,20 +171,41 @@ typedef struct {
 
 /* Timer */
 
+// timer typedef
 typedef struct {
-    volatile uint32_t CTRL;      // control flags
-    volatile uint32_t VALUE;     // current counter value (counts down)
-    volatile uint32_t RELOAD;    // value loaded when the counter reaches 0
-    volatile uint32_t INTSTATUS; // interrupt status
+	volatile uint32_t CTRL;		 // control flags
+	volatile uint32_t VALUE;	 // current counter value (counts down)
+	volatile uint32_t RELOAD;	 // value loaded when the counter reaches 0
+	volatile uint32_t INTSTATUS; // interrupt status
 } CMSDK_TIMER_TypeDef;
 
-#define CMSDK_TIMER0         ( ( CMSDK_TIMER_TypeDef * ) 0x40000000UL )
-#define CMSDK_TIMER1         ( ( CMSDK_TIMER_TypeDef * ) 0x40001000UL )
+#define CMSDK_TIMER0 ((CMSDK_TIMER_TypeDef *)0x40000000UL)
+#define CMSDK_TIMER1 ((CMSDK_TIMER_TypeDef *)0x40001000UL)
 
-#define TIMER_CTRL_EN        ( 1UL << 0 ) // enable the timer
-#define TIMER_CTRL_EXTIN     ( 1UL << 1 ) // use the external input as enable
-#define TIMER_CTRL_EXTCLK    ( 1UL << 2 ) // use the external input as clock
-#define TIMER_CTRL_IRQEN     ( 1UL << 3 ) // raise an IRQ on timeout
-#define TIMER_INT_PENDING    ( 1UL << 0 ) // IRQ pending; write 1 to clear
+#define TIMER_CTRL_EN (1UL << 0)	 // enable the timer
+#define TIMER_CTRL_EXTIN (1UL << 1)	 // use the external input as enable
+#define TIMER_CTRL_EXTCLK (1UL << 2) // use the external input as clock
+#define TIMER_CTRL_IRQEN (1UL << 3)	 // raise an IRQ on timeout
+#define TIMER_INT_PENDING (1UL << 0) // IRQ pending; write 1 to clear
+
+/* Watchdog */
+
+// watchdog typedef
+typedef struct {
+	volatile uint32_t LOAD;	  // start value of the down counter
+	volatile uint32_t VALUE;  // current counter value
+	volatile uint32_t CTRL;	  // control flags
+	volatile uint32_t INTCLR; // write to clear interrupt and reload
+	volatile uint32_t RIS;	  // raw interrupt status
+	volatile uint32_t MIS;	  // masked interrupt status
+	uint32_t RESERVED[762];	  // gap up to 0xC00
+	volatile uint32_t LOCK;	  // write key to unlock, anything else to lock
+} CMSDK_WDOG_TypeDef;
+
+#define CMSDK_WDOG ((CMSDK_WDOG_TypeDef *)0x40008000UL)
+
+#define WDOG_UNLOCK_KEY 0x1ACCE551UL // write it to LOCK to unlock
+#define WDOG_CTRL_INTEN (1UL << 0)	 // enable the interrupt (NMI)
+#define WDOG_CTRL_RESEN (1UL << 1)	 // reset the system on the second expiry
 
 #endif
