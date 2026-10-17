@@ -1,18 +1,19 @@
 #ifndef SYSTICK_H
 #define SYSTICK_H
 
+#include "driver.h"
 #include <stdint.h>
 
 // CPU clock frequency
 #define CPU_CLOCK_FREQ 25000000UL // 25 MHz
 
-// SysTick period
-#define TICK_TIME 10 // 10 ms
-
 // initializes SysTick
-void systick_init();
+void systick_init(void* ctx, int period_ms);
 
 // gets current uptime ms
-uint32_t systick_uptime_ms();
+unsigned int systick_tick(void* ctx);
+
+// timer device driver
+extern timer_driver systick_driver;
 
 #endif

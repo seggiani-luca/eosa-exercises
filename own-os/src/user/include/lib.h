@@ -13,8 +13,8 @@ unsigned int fwrite(int dev, const char *buf, unsigned int len);
 // reads a buffer from a device
 unsigned int fread(int dev, char *buf, unsigned int len);
 
-// gets current system tick
-int tick();
+// gets tick from timer device 
+int tick(int dev);
 
 /* format */
 
@@ -73,14 +73,14 @@ void fprintf(int dev, const char *fmt, ...);
 int fgets(int dev, char *buf, int siz);
 
 // libc thin wrappers
-#define putc(c) fputc(SYS_SERIAL, (c))
-#define getc() fgetc(SYS_SERIAL)
-#define puts(s) fputs(SYS_SERIAL, (s))
-#define putu(n) fputu(SYS_SERIAL, (n))
-#define puti(n) fputi(SYS_SERIAL, (n))
-#define putx(w) fputx(SYS_SERIAL, (w))
-#define printf(fmt, ...) fprintf(SYS_SERIAL, (fmt), ##__VA_ARGS__)
-#define gets(buf, siz) fgets(SYS_SERIAL, (buf), (siz))
+#define putc(c) fputc(SYS_SERIAL0, (c))
+#define getc() fgetc(SYS_SERIAL0)
+#define puts(s) fputs(SYS_SERIAL0, (s))
+#define putu(n) fputu(SYS_SERIAL0, (n))
+#define puti(n) fputi(SYS_SERIAL0, (n))
+#define putx(w) fputx(SYS_SERIAL0, (w))
+#define printf(fmt, ...) fprintf(SYS_SERIAL0, (fmt), ##__VA_ARGS__)
+#define gets(buf, siz) fgets(SYS_SERIAL0, (buf), (siz))
 
 /* util */
 
@@ -89,5 +89,9 @@ int atou(const char *s);
 
 // ASCII to signed integer
 int atoi(const char *s);
+
+/* time */
+
+void sleep(unsigned int ms);
 
 #endif

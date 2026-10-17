@@ -79,24 +79,6 @@
     .word Default_Handler 
     .word Default_Handler 
 
-.weak UART1RX_Handler
-.thumb_set UART1RX_Handler, Default_Handler
-
-.weak UART1TX_Handler
-.thumb_set UART1TX_Handler, Default_Handler
-
-.weak UART2RX_Handler
-.thumb_set UART2RX_Handler, Default_Handler
-
-.weak UART2TX_Handler
-.thumb_set UART2TX_Handler, Default_Handler
-
-.weak TIMER0_Handler
-.thumb_set TIMER0_Handler, Default_Handler
-
-.weak TIMER1_Handler
-.thumb_set TIMER1_Handler, Default_Handler
-
 .weak DUALTIMER_Handler
 .thumb_set DUALTIMER_Handler, Default_Handler
 

@@ -5,7 +5,7 @@
 #include <stdarg.h>
 
 // user stdio putc function
-void kern_putc(void *ctx, char c) { uart_putc(c); }
+void kern_putc(void *ctx, char c) { uart_putc(uart0_driver.ctx, c); }
 
 void kprintf(const char *fmt, ...) {
 	va_list ap;

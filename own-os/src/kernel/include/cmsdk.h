@@ -169,4 +169,22 @@ typedef struct {
 #define MPU_AP_RO_NO 5UL // 101: privileged: RO; unprivileged: no
 #define MPU_AP_RO_RO 6UL // 110: privileged: RO; unprivileged: RO
 
+/* Timer */
+
+typedef struct {
+    volatile uint32_t CTRL;      // control flags
+    volatile uint32_t VALUE;     // current counter value (counts down)
+    volatile uint32_t RELOAD;    // value loaded when the counter reaches 0
+    volatile uint32_t INTSTATUS; // interrupt status
+} CMSDK_TIMER_TypeDef;
+
+#define CMSDK_TIMER0         ( ( CMSDK_TIMER_TypeDef * ) 0x40000000UL )
+#define CMSDK_TIMER1         ( ( CMSDK_TIMER_TypeDef * ) 0x40001000UL )
+
+#define TIMER_CTRL_EN        ( 1UL << 0 ) // enable the timer
+#define TIMER_CTRL_EXTIN     ( 1UL << 1 ) // use the external input as enable
+#define TIMER_CTRL_EXTCLK    ( 1UL << 2 ) // use the external input as clock
+#define TIMER_CTRL_IRQEN     ( 1UL << 3 ) // raise an IRQ on timeout
+#define TIMER_INT_PENDING    ( 1UL << 0 ) // IRQ pending; write 1 to clear
+
 #endif

@@ -1,5 +1,5 @@
 #include "../include/cmsdk.h"
-#include "../include/serial.h"
+#include "../include/log.h"
 
 void NMI_Handler() {
 	kprintf("NMI fault\n");

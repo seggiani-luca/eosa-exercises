@@ -1,11 +1,9 @@
 #include "../include/lib.h"
 
-extern void kprintf(const char* fmt, ...);
-
 int process_a_main(void) {
-	int a = 2;
-	printf("Ciao dal processo A!\n");
-	printf("Il mio stack inizia a %x (%d)\n", &a, a);
+	fprintf(SYS_SERIAL0, "Ciao seriale 0!\n");
+	fprintf(SYS_SERIAL1, "Ciao seriale 1!\n");
+	fprintf(SYS_SERIAL2, "Ciao seriale 2!\n");
 
 	return 0;
 }

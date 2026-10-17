@@ -30,7 +30,9 @@ QEMU   := qemu-system-arm
 QFLAGS_UART := -machine mps2-an385 \
                -monitor null \
                -nographic \
-               -serial stdio
+               -serial stdio \
+               -serial file:$(OUT)/uart1.log \
+               -serial file:$(OUT)/uart2.log
 QFLAGS_SHST := -machine mps2-an385 \
                -monitor null \
                -nographic \

@@ -3,7 +3,9 @@
 #include "include/memory.h"
 #include "include/serial.h"
 #include "include/systick.h"
+#include "include/timer.h"
 #include "include/wfi.h"
+#include "include/log.h"
 
 // initalization routines, in startup
 extern void Data_Init(uint32_t *start, uint32_t *end, const uint32_t *source);
@@ -18,11 +20,17 @@ int kernel_main(void) {
 	// allow devices over SVC
 	SCB->SHPR[7] = 0xE0;
 
-	// init SysTick
-	systick_init();
+	// init SysTick timer
+	systick_init(0, 10);
 
-	// init serial I/O
-	uart_init();
+	// init other timers
+	timer_init(timer0_driver.ctx, 10);
+	timer_init(timer1_driver.ctx, 2000);
+
+	// init serial interfaces 
+	uart_init(uart0_driver.ctx);
+	uart_init(uart1_driver.ctx);
+	uart_init(uart2_driver.ctx);
 
 	// setup MPU
 	mem_init();
