@@ -1,6 +1,6 @@
 #include "../../include/timer.h"
-#include "../../include/watchdog.h"
 #include "../../include/cmsdk.h"
+#include "../../include/watchdog.h"
 
 // timer handling block
 typedef struct {
@@ -37,7 +37,7 @@ void timer_init(void *ctx, int period_ms) {
 	bl->timer->CTRL = 0;
 
 	// enable NVIC interrupts
-	NVIC->IPR[bl->irq] = 0xC0;
+	NVIC->IPR[bl->irq] = NVIC_TIMER_PRIO;
 	NVIC->ISER[bl->irq / 32] = 1UL << (bl->irq % 32);
 
 	// load period

@@ -85,13 +85,10 @@ extern uint32_t {p["ebss"]};
 """)
 
     f.write(f"""\
-// process descriptor table
-static process process_table[{num_processes}];
-
 #define NUM_PROCESSES {num_processes}
 
 // initialize process descriptors
-static void init_process_table(void) {{
+static void init_process_table(process* process_table) {{
 """);
 
     for p in processes:

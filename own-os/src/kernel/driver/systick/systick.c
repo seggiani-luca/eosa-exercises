@@ -1,5 +1,6 @@
 #include "../../include/systick.h"
 #include "../../include/cmsdk.h"
+#include "../../include/process.h"
 
 timer_driver systick_driver = {
 	.init = systick_init,
@@ -7,8 +8,8 @@ timer_driver systick_driver = {
 };
 
 // current ticks
-static volatile unsigned int ticks;
-static int period;
+volatile unsigned int ticks = 0;
+int period;
 
 void systick_init(void *ctx, int period_ms) {
 	ticks = 0;
@@ -22,5 +23,3 @@ void systick_init(void *ctx, int period_ms) {
 }
 
 unsigned int systick_tick(void *ctx) { return ticks * period; }
-
-void SysTick_Handler(void) { ticks++; }

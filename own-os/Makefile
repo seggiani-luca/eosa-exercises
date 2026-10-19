@@ -48,7 +48,7 @@ GDB := gdb
 
 all: $(BIN)
 
-$(BIN): processes $(C_OBJECTS) $(S_OBJECTS) 
+$(BIN): $(PROC_LSCRIPT) $(C_OBJECTS) $(S_OBJECTS) 
 	$(CC) $(CFLAGS) $(LFLAGS) $(S_OBJECTS) $(C_OBJECTS) -o $(BIN)
 
 $(OUT)/%.o: %.c
@@ -62,7 +62,7 @@ $(OUT)/%.o: %.s
 $(OUT):
 	mkdir -p $(OUT)
 
-processes:
+$(PROC_LSCRIPT): $(PROC_SOURCES) $(KERN_LSCRIPT) 
 	$(PY) $(PROC_SCRIPT) -d $(PROC_SOURCES) -k $(KERN_LSCRIPT) -l $(PROC_LSCRIPT) -o $(PROC_HEADER)
 
 run: $(BIN)
@@ -76,6 +76,8 @@ attach:
 
 clean:
 	rm -rf $(OUT)
+	rm -f $(PROC_LSCRIPT)
+	rm -f $(PROC_HEADER)
 
 format:
 	find . -type f \( \

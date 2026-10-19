@@ -95,8 +95,8 @@ void uart_init(void *ctx) {
 	bl->rx_buf.head = bl->rx_buf.tail = 0;
 
 	// set NVIC priority
-	NVIC->IPR[bl->tx_irq] = 0xC0;
-	NVIC->IPR[bl->rx_irq] = 0xC0;
+	NVIC->IPR[bl->tx_irq] = NVIC_SERIAL_PRIO;
+	NVIC->IPR[bl->rx_irq] = NVIC_SERIAL_PRIO;
 
 	// enable NVIC interrupts
 	NVIC->ISER[bl->tx_irq / 32] = 1UL << (bl->tx_irq % 32);

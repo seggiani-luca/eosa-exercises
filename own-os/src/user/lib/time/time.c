@@ -5,6 +5,6 @@
 
 void sleep(unsigned int ms) {
 	unsigned int now = tick(SLEEP_TIMER);
-	while (tick(SLEEP_TIMER) - now < ms)
-		wfi();
+	do wfi();
+	while (tick(SLEEP_TIMER) - now < ms);
 }

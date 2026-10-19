@@ -38,13 +38,10 @@ extern uint32_t __process_b_ebss;
 
 /* process descriptors */
 
-// process descriptor table
-static process process_table[2];
-
 #define NUM_PROCESSES 2
 
 // initialize process descriptors
-static void init_process_table(void) {
+static void init_process_table(process* process_table) {
     // process_a
     process_table[0].name = "process_a";
     process_table[0].entry = process_a_main;

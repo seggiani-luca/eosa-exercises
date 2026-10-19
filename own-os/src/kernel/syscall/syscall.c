@@ -6,6 +6,7 @@
 #include "../include/systick.h"
 #include "../include/timer.h"
 #include <stdint.h>
+#include <strings.h>
 
 typedef uintptr_t syscall_arg;
 typedef uint32_t syscall_ret;
@@ -77,27 +78,11 @@ syscall_ret syscall_tick(syscall_arg dev,
 	return driver->tick(driver->ctx);
 }
 
-syscall_ret syscall_start_proc(syscall_arg proc,
-							   syscall_arg b __attribute__((unused)),
-							   syscall_arg c __attribute__((unused))) {
-	do_start_process((process *)proc);
-	return 0;
-}
-
-syscall_ret syscall_exit_proc(syscall_arg arg0 __attribute__((unused)),
-							  syscall_arg arg1 __attribute__((unused)),
-							  syscall_arg arg2 __attribute__((unused))) {
-	do_exit_process();
-	return 0;
-}
-
 // syscall table
 typedef syscall_ret (*syscall_fn)(syscall_arg, syscall_arg, syscall_arg);
-static const syscall_fn syscall_table[] = {
-	[SYS_WRITE] = syscall_write,		 [SYS_READ] = syscall_read,
-	[SYS_TICK] = syscall_tick,			 [SYS_START_PROC] = syscall_start_proc,
-	[SYS_EXIT_PROC] = syscall_exit_proc,
-};
+static const syscall_fn syscall_table[] = {[SYS_WRITE] = syscall_write,
+										   [SYS_READ] = syscall_read,
+										   [SYS_TICK] = syscall_tick};
 #define SYSCALL_TABLE_SIZE (sizeof(syscall_table) / sizeof(syscall_fn))
 
 uint32_t dispatch_syscall(exception_frame *frame, uint32_t syscall,
@@ -110,9 +95,5 @@ uint32_t dispatch_syscall(exception_frame *frame, uint32_t syscall,
 
 	frame->r0 = syscall_table[syscall](frame->r0, frame->r1, frame->r2);
 
-	if (syscall == SYS_START_PROC)
-		return 0xFFFFFFFD;
-	if (syscall == SYS_EXIT_PROC)
-		return 0xFFFFFFF9;
 	return exc_return;
 }

@@ -5,11 +5,17 @@
 
 // process descriptor
 typedef struct {
+	// stack pointer
+	uint32_t sp;
+
 	// short name
 	const char *name;
 
 	// entry point
 	int (*entry)(void);
+
+	// state
+	int running;
 
 	// partition bounds
 	uintptr_t spart;
@@ -28,19 +34,20 @@ typedef struct {
 	uintptr_t ebss;
 } process;
 
-// initializes process memory
-void init_process(process *proc);
+// initializes all processes
+void init_processes();
 
-// starts a process, from thread mode
-void start_process(process *proc);
+// jump to first process
+void start_process();
 
-// starts a process, from handler mode
-void do_start_process(process *proc);
-
-// exits from a process, from thread mode
+// exit process 
 void exit_process();
 
-// exits from a process, from handler mode
-void do_exit_process();
+// schedules next process and jumps to it
+void scheduler();
+
+// context switching
+extern uint32_t context_out();
+extern void context_in(uint32_t sp);
 
 #endif
