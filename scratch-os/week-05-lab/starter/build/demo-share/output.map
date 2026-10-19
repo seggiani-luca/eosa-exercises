@@ -1,0 +1,554 @@
+
+Merging object attributes
+
+
+Discarded input sections
+
+ .group         0x00000000        0xc build/demo-share/kernel/faults.o
+ .group         0x00000000        0xc build/demo-share/kernel/faults.o
+ .group         0x00000000        0xc build/demo-share/kernel/faults.o
+ .group         0x00000000        0xc build/demo-share/kernel/faults.o
+ .group         0x00000000        0xc build/demo-share/kernel/kprintf.o
+ .group         0x00000000        0xc build/demo-share/kernel/kprintf.o
+ .group         0x00000000        0xc build/demo-share/kernel/kprintf.o
+ .debug_macro   0x00000000      0xad8 build/demo-share/kernel/kprintf.o
+ .debug_macro   0x00000000      0x34e build/demo-share/kernel/kprintf.o
+ .group         0x00000000        0xc build/demo-share/kernel/mpu.o
+ .group         0x00000000        0xc build/demo-share/kernel/mpu.o
+ .group         0x00000000        0xc build/demo-share/kernel/mpu.o
+ .group         0x00000000        0xc build/demo-share/kernel/mpu.o
+ .debug_macro   0x00000000      0xad8 build/demo-share/kernel/mpu.o
+ .debug_macro   0x00000000      0x34e build/demo-share/kernel/mpu.o
+ .debug_macro   0x00000000      0x190 build/demo-share/kernel/mpu.o
+ .debug_macro   0x00000000      0x22e build/demo-share/kernel/mpu.o
+ .group         0x00000000        0xc build/demo-share/kernel/syscall.o
+ .group         0x00000000        0xc build/demo-share/kernel/syscall.o
+ .group         0x00000000        0xc build/demo-share/kernel/syscall.o
+ .group         0x00000000        0xc build/demo-share/kernel/syscall.o
+ .debug_macro   0x00000000      0xad8 build/demo-share/kernel/syscall.o
+ .debug_macro   0x00000000      0x34e build/demo-share/kernel/syscall.o
+ .group         0x00000000        0xc build/demo-share/kernel/task.o
+ .group         0x00000000        0xc build/demo-share/kernel/task.o
+ .group         0x00000000        0xc build/demo-share/kernel/task.o
+ .debug_macro   0x00000000      0xad8 build/demo-share/kernel/task.o
+ .debug_macro   0x00000000      0x34e build/demo-share/kernel/task.o
+ .debug_macro   0x00000000       0x28 build/demo-share/kernel/task.o
+ .group         0x00000000        0xc build/demo-share/drivers/systick.o
+ .group         0x00000000        0xc build/demo-share/drivers/systick.o
+ .group         0x00000000        0xc build/demo-share/drivers/systick.o
+ .group         0x00000000        0xc build/demo-share/drivers/systick.o
+ .debug_macro   0x00000000      0xad8 build/demo-share/drivers/systick.o
+ .debug_macro   0x00000000      0x34e build/demo-share/drivers/systick.o
+ .debug_macro   0x00000000      0x190 build/demo-share/drivers/systick.o
+ .debug_macro   0x00000000      0x22e build/demo-share/drivers/systick.o
+ .group         0x00000000        0xc build/demo-share/drivers/uart.o
+ .group         0x00000000        0xc build/demo-share/drivers/uart.o
+ .group         0x00000000        0xc build/demo-share/drivers/uart.o
+ .group         0x00000000        0xc build/demo-share/drivers/uart.o
+ .debug_macro   0x00000000      0xad8 build/demo-share/drivers/uart.o
+ .debug_macro   0x00000000      0x34e build/demo-share/drivers/uart.o
+ .debug_macro   0x00000000      0x190 build/demo-share/drivers/uart.o
+ .debug_macro   0x00000000      0x22e build/demo-share/drivers/uart.o
+ .group         0x00000000        0xc build/demo-share/lib/format.o
+ .group         0x00000000        0xc build/demo-share/lib/format.o
+ .group         0x00000000        0xc build/demo-share/lib/format.o
+ .debug_macro   0x00000000      0xad8 build/demo-share/lib/format.o
+ .debug_macro   0x00000000       0x58 build/demo-share/lib/format.o
+ .debug_macro   0x00000000      0x34e build/demo-share/lib/format.o
+ .group         0x00000000        0xc build/demo-share/lib/printf.o
+ .group         0x00000000        0xc build/demo-share/lib/printf.o
+ .group         0x00000000        0xc build/demo-share/lib/printf.o
+ .group         0x00000000        0xc build/demo-share/lib/printf.o
+ .debug_macro   0x00000000      0xad8 build/demo-share/lib/printf.o
+ .debug_macro   0x00000000       0x58 build/demo-share/lib/printf.o
+ .debug_macro   0x00000000      0x34e build/demo-share/lib/printf.o
+ .debug_macro   0x00000000       0x28 build/demo-share/lib/printf.o
+ .group         0x00000000        0xc build/demo-share/src/main.o
+ .group         0x00000000        0xc build/demo-share/src/main.o
+ .debug_macro   0x00000000      0xad8 build/demo-share/src/main.o
+ .debug_macro   0x00000000      0x34e build/demo-share/src/main.o
+ .group         0x00000000        0xc build/demo-share/src/task_a.o
+ .group         0x00000000        0xc build/demo-share/src/task_a.o
+ .group         0x00000000        0xc build/demo-share/src/task_a.o
+ .debug_macro   0x00000000      0xad8 build/demo-share/src/task_a.o
+ .debug_macro   0x00000000      0x34e build/demo-share/src/task_a.o
+ .debug_macro   0x00000000       0x28 build/demo-share/src/task_a.o
+ .group         0x00000000        0xc build/demo-share/src/task_b.o
+ .group         0x00000000        0xc build/demo-share/src/task_b.o
+ .group         0x00000000        0xc build/demo-share/src/task_b.o
+ .debug_macro   0x00000000      0xad8 build/demo-share/src/task_b.o
+ .debug_macro   0x00000000      0x34e build/demo-share/src/task_b.o
+ .debug_macro   0x00000000       0x28 build/demo-share/src/task_b.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x00000000         0x00400000         xr
+RAM              0x20000000         0x00400000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD /usr/lib/gcc/arm-none-eabi/16.2.0/thumb/v7-m/nofp/libgcc.a
+LOAD build/demo-share/boot/startup.o
+LOAD build/demo-share/kernel/faults.o
+LOAD build/demo-share/kernel/kprintf.o
+LOAD build/demo-share/kernel/mpu.o
+LOAD build/demo-share/kernel/syscall.o
+LOAD build/demo-share/kernel/task.o
+LOAD build/demo-share/kernel/irq.o
+LOAD build/demo-share/kernel/svc_entry.o
+LOAD build/demo-share/drivers/systick.o
+LOAD build/demo-share/drivers/uart.o
+LOAD build/demo-share/lib/format.o
+LOAD build/demo-share/lib/printf.o
+LOAD build/demo-share/lib/syscalls.o
+LOAD build/demo-share/src/main.o
+LOAD build/demo-share/src/task_a.o
+LOAD build/demo-share/src/task_b.o
+                0x20400000                        _estack = (ORIGIN (RAM) + LENGTH (RAM))
+                0x00001000                        _Min_Stack_Size = 0x1000
+                0x00001000                        PART_SIZE = 0x1000
+                0x00000400                        TASK_STACK_SIZE = 0x400
+
+.isr_vector     0x00000000       0xc0
+                0x00000000                        . = ALIGN (0x4)
+ *(.isr_vector)
+ .isr_vector    0x00000000       0xc0 build/demo-share/boot/startup.o
+                0x00000000                isr_vector
+                0x000000c0                        . = ALIGN (0x4)
+
+.text           0x000000c0      0xfb8
+                0x000000c0                        . = ALIGN (0x4)
+ *(.text*)
+ .text          0x000000c0       0x90 build/demo-share/boot/startup.o
+                0x000000c0                Reset_Handler
+                0x0000014c                DebugMon_Handler
+                0x0000014c                TIMER0_Handler
+                0x0000014c                UART2RX_Handler
+                0x0000014c                PendSV_Handler
+                0x0000014c                NMI_Handler
+                0x0000014c                UART0RX_Handler
+                0x0000014c                UART1TX_Handler
+                0x0000014c                TIMER1_Handler
+                0x0000014c                UART2TX_Handler
+                0x0000014c                UARTOVF_Handler
+                0x0000014c                Default_Handler
+                0x0000014c                UART1RX_Handler
+                0x0000014c                DUALTIMER_Handler
+ .text          0x00000150       0xe8 build/demo-share/kernel/faults.o
+                0x00000158                HardFault_Handler
+                0x00000178                MemManage_Handler
+                0x000001f8                BusFault_Handler
+                0x00000218                UsageFault_Handler
+ .text          0x00000238       0x48 build/demo-share/kernel/kprintf.o
+                0x00000254                kprintf
+ .text          0x00000280       0xc8 build/demo-share/kernel/mpu.o
+                0x00000280                mpu_init
+                0x000002b0                mpu_set_task_region
+ .text          0x00000348      0x190 build/demo-share/kernel/syscall.o
+                0x00000434                svc_dispatch
+ .text          0x000004d8      0x194 build/demo-share/kernel/task.o
+                0x000004d8                partition_init
+                0x00000514                task_current
+                0x00000600                task_start_first
+                0x00000610                task_exit_current
+ .text          0x0000066c        0xe build/demo-share/kernel/irq.o
+                0x0000066c                irq_save
+                0x00000674                irq_restore
+ .text          0x0000067a       0x16 build/demo-share/kernel/svc_entry.o
+                0x0000067a                SVC_Handler
+ .text          0x00000690       0x60 build/demo-share/drivers/systick.o
+                0x00000690                systick_init
+                0x000006c0                SysTick_Handler
+                0x000006dc                systick_uptime_ms
+ .text          0x000006f0      0x21c build/demo-share/drivers/uart.o
+                0x00000778                uart_init
+                0x000007c4                uart_putc_polled
+                0x000007f0                uart_getc_polled
+                0x00000818                uart_write
+                0x000008c8                UART0TX_Handler
+ .text          0x0000090c      0x288 build/demo-share/lib/format.o
+                0x000009a6                utoa_dec
+                0x000009c4                utoa_hex
+                0x00000a14                vformat
+ .text          0x00000b94      0x104 build/demo-share/lib/printf.o
+                0x00000b94                write_all
+                0x00000c24                printf
+                0x00000c6c                sleep_ms
+ .text          0x00000c98       0x1a build/demo-share/lib/syscalls.o
+                0x00000c98                sys_write
+                0x00000c9c                sys_read
+                0x00000ca0                sys_uptime
+                0x00000ca4                sys_exit
+                0x00000caa                task_exit
+ *fill*         0x00000cb2        0x2 
+ .text          0x00000cb4       0x2c build/demo-share/src/main.o
+                0x00000cb4                main
+ .text          0x00000ce0       0x94 build/demo-share/src/task_a.o
+                0x00000ce0                task_a
+ .text          0x00000d74       0xb4 build/demo-share/src/task_b.o
+                0x00000d74                task_b
+ *(.rodata*)
+ .rodata        0x00000e28       0xb7 build/demo-share/kernel/faults.o
+ *fill*         0x00000edf        0x1 
+ .rodata        0x00000ee0       0x10 build/demo-share/kernel/syscall.o
+ .rodata        0x00000ef0       0x6c build/demo-share/kernel/task.o
+ .rodata        0x00000f5c        0x7 build/demo-share/lib/format.o
+ *fill*         0x00000f63        0x1 
+ .rodata        0x00000f64       0x30 build/demo-share/src/main.o
+ .rodata        0x00000f94       0x3b build/demo-share/src/task_a.o
+ *fill*         0x00000fcf        0x1 
+ .rodata        0x00000fd0       0xa5 build/demo-share/src/task_b.o
+                0x00001078                        . = ALIGN (0x4)
+ *fill*         0x00001075        0x3 
+                0x00001078                        _etext = .
+
+.glue_7         0x00001078        0x0
+ .glue_7        0x00001078        0x0 linker stubs
+
+.glue_7t        0x00001078        0x0
+ .glue_7t       0x00001078        0x0 linker stubs
+
+.vfp11_veneer   0x00001078        0x0
+ .vfp11_veneer  0x00001078        0x0 linker stubs
+
+.v4_bx          0x00001078        0x0
+ .v4_bx         0x00001078        0x0 linker stubs
+
+.iplt           0x00001078        0x0
+ .iplt          0x00001078        0x0 build/demo-share/boot/startup.o
+
+.rel.dyn        0x00001078        0x0
+ .rel.iplt      0x00001078        0x0 build/demo-share/boot/startup.o
+
+.task_a_stack   0x20000000      0x400
+                0x20000000                        _task_a_part_start = .
+                0x20000400                        . = (. + TASK_STACK_SIZE)
+ *fill*         0x20000000      0x400 
+                0x20000400                        _task_a_stack_top = .
+
+.task_a_data    0x20000400        0x4 load address 0x00001078
+                0x20000400                        . = ALIGN (0x4)
+                0x20000400                        _task_a_data_start = .
+ *task_a.o(.data .data.* .bss .bss.* COMMON)
+ .data          0x20000400        0x0 build/demo-share/src/task_a.o
+ .bss           0x20000400        0x4 build/demo-share/src/task_a.o
+                0x20000404                        . = ALIGN (0x4)
+                0x20000404                        _task_a_data_end = .
+                0x00001078                        _task_a_data_load = LOADADDR (.task_a_data)
+
+.task_a_pad     0x20000404      0xbfc load address 0x0000107c
+                0x20001000                        . = (_task_a_part_start + PART_SIZE)
+ *fill*         0x20000404      0xbfc 
+                0x20001000                        _task_a_part_end = .
+                0x20000f00                        _shared_start = (_task_a_part_end - 0x100)
+                0x20001000                        _shared_end = _task_a_part_end
+
+.task_b_stack   0x20001000      0x400
+                0x20001000                        _task_b_part_start = .
+                0x20001400                        . = (. + TASK_STACK_SIZE)
+ *fill*         0x20001000      0x400 
+                0x20001400                        _task_b_stack_top = .
+
+.task_b_data    0x20001400        0x4 load address 0x0000107c
+                0x20001400                        . = ALIGN (0x4)
+                0x20001400                        _task_b_data_start = .
+ *task_b.o(.data .data.* .bss .bss.* COMMON)
+ .data          0x20001400        0x0 build/demo-share/src/task_b.o
+ .bss           0x20001400        0x4 build/demo-share/src/task_b.o
+                0x20001404                        . = ALIGN (0x4)
+                0x20001404                        _task_b_data_end = .
+                0x0000107c                        _task_b_data_load = LOADADDR (.task_b_data)
+
+.task_b_pad     0x20001404      0xbfc load address 0x00001080
+                0x20002000                        . = (_task_b_part_start + PART_SIZE)
+ *fill*         0x20001404      0xbfc 
+                0x20002000                        _task_b_part_end = .
+                0x00000001                        ASSERT ((_task_a_data_end <= (_task_a_part_start + PART_SIZE)), task A data does not fit in its partition)
+                0x00000001                        ASSERT ((_task_b_data_end <= (_task_b_part_start + PART_SIZE)), task B data does not fit in its partition)
+                0x00001080                        _sidata = LOADADDR (.data)
+
+.data           0x20002000        0x4 load address 0x00001080
+                0x20002000                        . = ALIGN (0x4)
+                0x20002000                        _sdata = .
+ *(.data*)
+ .data          0x20002000        0x0 build/demo-share/boot/startup.o
+ .data          0x20002000        0x0 build/demo-share/kernel/faults.o
+ .data          0x20002000        0x0 build/demo-share/kernel/kprintf.o
+ .data          0x20002000        0x0 build/demo-share/kernel/mpu.o
+ .data          0x20002000        0x0 build/demo-share/kernel/syscall.o
+ .data          0x20002000        0x4 build/demo-share/kernel/task.o
+ .data          0x20002004        0x0 build/demo-share/kernel/irq.o
+ .data          0x20002004        0x0 build/demo-share/kernel/svc_entry.o
+ .data          0x20002004        0x0 build/demo-share/drivers/systick.o
+ .data          0x20002004        0x0 build/demo-share/drivers/uart.o
+ .data          0x20002004        0x0 build/demo-share/lib/format.o
+ .data          0x20002004        0x0 build/demo-share/lib/printf.o
+ .data          0x20002004        0x0 build/demo-share/lib/syscalls.o
+ .data          0x20002004        0x0 build/demo-share/src/main.o
+                0x20002004                        . = ALIGN (0x4)
+                0x20002004                        _edata = .
+
+.igot.plt       0x20002004        0x0 load address 0x00001084
+ .igot.plt      0x20002004        0x0 build/demo-share/boot/startup.o
+
+.bss            0x20002004       0x50 load address 0x00001084
+                0x20002004                        . = ALIGN (0x4)
+                0x20002004                        _sbss = .
+ *(.bss*)
+ .bss           0x20002004        0x0 build/demo-share/boot/startup.o
+ .bss           0x20002004        0x0 build/demo-share/kernel/faults.o
+ .bss           0x20002004        0x0 build/demo-share/kernel/kprintf.o
+ .bss           0x20002004        0x0 build/demo-share/kernel/mpu.o
+ .bss           0x20002004        0x0 build/demo-share/kernel/syscall.o
+ .bss           0x20002004        0x0 build/demo-share/kernel/task.o
+ .bss           0x20002004        0x0 build/demo-share/kernel/irq.o
+ .bss           0x20002004        0x0 build/demo-share/kernel/svc_entry.o
+ .bss           0x20002004        0x4 build/demo-share/drivers/systick.o
+                0x20002004                uptime_ms
+ .bss           0x20002008       0x4c build/demo-share/drivers/uart.o
+ .bss           0x20002054        0x0 build/demo-share/lib/format.o
+ .bss           0x20002054        0x0 build/demo-share/lib/printf.o
+ .bss           0x20002054        0x0 build/demo-share/lib/syscalls.o
+ .bss           0x20002054        0x0 build/demo-share/src/main.o
+ *(COMMON)
+                0x20002054                        . = ALIGN (0x4)
+                0x20002054                        _ebss = .
+                0x203ff000                        __StackLimit = (_estack - _Min_Stack_Size)
+                0x00000001                        ASSERT ((__StackLimit >= _ebss), region RAM overflowed: .bss collides with the stack)
+OUTPUT(build/demo-share/scratch-os.axf elf32-littlearm)
+LOAD linker stubs
+
+.ARM.attributes
+                0x00000000       0x2f
+ .ARM.attributes
+                0x00000000       0x21 build/demo-share/boot/startup.o
+ .ARM.attributes
+                0x00000021       0x2d build/demo-share/kernel/faults.o
+ .ARM.attributes
+                0x0000004e       0x2d build/demo-share/kernel/kprintf.o
+ .ARM.attributes
+                0x0000007b       0x2d build/demo-share/kernel/mpu.o
+ .ARM.attributes
+                0x000000a8       0x2d build/demo-share/kernel/syscall.o
+ .ARM.attributes
+                0x000000d5       0x2d build/demo-share/kernel/task.o
+ .ARM.attributes
+                0x00000102       0x21 build/demo-share/kernel/irq.o
+ .ARM.attributes
+                0x00000123       0x21 build/demo-share/kernel/svc_entry.o
+ .ARM.attributes
+                0x00000144       0x2d build/demo-share/drivers/systick.o
+ .ARM.attributes
+                0x00000171       0x2d build/demo-share/drivers/uart.o
+ .ARM.attributes
+                0x0000019e       0x2d build/demo-share/lib/format.o
+ .ARM.attributes
+                0x000001cb       0x2d build/demo-share/lib/printf.o
+ .ARM.attributes
+                0x000001f8       0x21 build/demo-share/lib/syscalls.o
+ .ARM.attributes
+                0x00000219       0x2d build/demo-share/src/main.o
+ .ARM.attributes
+                0x00000246       0x2d build/demo-share/src/task_a.o
+ .ARM.attributes
+                0x00000273       0x2d build/demo-share/src/task_b.o
+
+.comment        0x00000000       0x1e
+ .comment       0x00000000       0x1e build/demo-share/kernel/faults.o
+                                 0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 build/demo-share/kernel/kprintf.o
+                                 0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 build/demo-share/kernel/mpu.o
+                                 0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 build/demo-share/kernel/syscall.o
+                                 0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 build/demo-share/kernel/task.o
+                                 0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 build/demo-share/drivers/systick.o
+                                 0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 build/demo-share/drivers/uart.o
+                                 0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 build/demo-share/lib/format.o
+                                 0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 build/demo-share/lib/printf.o
+                                 0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 build/demo-share/src/main.o
+                                 0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 build/demo-share/src/task_a.o
+                                 0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 build/demo-share/src/task_b.o
+                                 0x1f (size before relaxing)
+
+.debug_line     0x00000000     0x10f7
+ .debug_line    0x00000000       0xa2 build/demo-share/boot/startup.o
+ .debug_line    0x000000a2      0x11a build/demo-share/kernel/faults.o
+ .debug_line    0x000001bc       0xec build/demo-share/kernel/kprintf.o
+ .debug_line    0x000002a8      0x129 build/demo-share/kernel/mpu.o
+ .debug_line    0x000003d1      0x1d1 build/demo-share/kernel/syscall.o
+ .debug_line    0x000005a2      0x1a4 build/demo-share/kernel/task.o
+ .debug_line    0x00000746       0x4f build/demo-share/kernel/irq.o
+ .debug_line    0x00000795       0x50 build/demo-share/kernel/svc_entry.o
+ .debug_line    0x000007e5       0xe5 build/demo-share/drivers/systick.o
+ .debug_line    0x000008ca      0x207 build/demo-share/drivers/uart.o
+ .debug_line    0x00000ad1      0x1c9 build/demo-share/lib/format.o
+ .debug_line    0x00000c9a      0x146 build/demo-share/lib/printf.o
+ .debug_line    0x00000de0       0x5a build/demo-share/lib/syscalls.o
+ .debug_line    0x00000e3a       0xcf build/demo-share/src/main.o
+ .debug_line    0x00000f09       0xff build/demo-share/src/task_a.o
+ .debug_line    0x00001008       0xef build/demo-share/src/task_b.o
+
+.debug_line_str
+                0x00000000       0x7c
+ .debug_line_str
+                0x00000000       0x7c build/demo-share/boot/startup.o
+                                 0x54 (size before relaxing)
+ .debug_line_str
+                0x0000007c        0x0 build/demo-share/kernel/irq.o
+                                 0x52 (size before relaxing)
+ .debug_line_str
+                0x0000007c        0x0 build/demo-share/kernel/svc_entry.o
+                                 0x58 (size before relaxing)
+ .debug_line_str
+                0x0000007c        0x0 build/demo-share/lib/syscalls.o
+                                 0x54 (size before relaxing)
+
+.debug_info     0x00000000     0x1900
+ .debug_info    0x00000000       0x3e build/demo-share/boot/startup.o
+ .debug_info    0x0000003e      0x1db build/demo-share/kernel/faults.o
+ .debug_info    0x00000219      0x15d build/demo-share/kernel/kprintf.o
+ .debug_info    0x00000376      0x14d build/demo-share/kernel/mpu.o
+ .debug_info    0x000004c3      0x372 build/demo-share/kernel/syscall.o
+ .debug_info    0x00000835      0x2ec build/demo-share/kernel/task.o
+ .debug_info    0x00000b21       0x3c build/demo-share/kernel/irq.o
+ .debug_info    0x00000b5d       0x31 build/demo-share/kernel/svc_entry.o
+ .debug_info    0x00000b8e      0x11a build/demo-share/drivers/systick.o
+ .debug_info    0x00000ca8      0x36c build/demo-share/drivers/uart.o
+ .debug_info    0x00001014      0x2be build/demo-share/lib/format.o
+ .debug_info    0x000012d2      0x263 build/demo-share/lib/printf.o
+ .debug_info    0x00001535       0x5d build/demo-share/lib/syscalls.o
+ .debug_info    0x00001592       0xc6 build/demo-share/src/main.o
+ .debug_info    0x00001658      0x143 build/demo-share/src/task_a.o
+ .debug_info    0x0000179b      0x165 build/demo-share/src/task_b.o
+
+.debug_abbrev   0x00000000      0xf07
+ .debug_abbrev  0x00000000       0x28 build/demo-share/boot/startup.o
+ .debug_abbrev  0x00000028      0x11e build/demo-share/kernel/faults.o
+ .debug_abbrev  0x00000146       0xf6 build/demo-share/kernel/kprintf.o
+ .debug_abbrev  0x0000023c       0xe8 build/demo-share/kernel/mpu.o
+ .debug_abbrev  0x00000324      0x17c build/demo-share/kernel/syscall.o
+ .debug_abbrev  0x000004a0      0x196 build/demo-share/kernel/task.o
+ .debug_abbrev  0x00000636       0x28 build/demo-share/kernel/irq.o
+ .debug_abbrev  0x0000065e       0x28 build/demo-share/kernel/svc_entry.o
+ .debug_abbrev  0x00000686       0xc4 build/demo-share/drivers/systick.o
+ .debug_abbrev  0x0000074a      0x1de build/demo-share/drivers/uart.o
+ .debug_abbrev  0x00000928      0x156 build/demo-share/lib/format.o
+ .debug_abbrev  0x00000a7e      0x1b9 build/demo-share/lib/printf.o
+ .debug_abbrev  0x00000c37       0x28 build/demo-share/lib/syscalls.o
+ .debug_abbrev  0x00000c5f       0x92 build/demo-share/src/main.o
+ .debug_abbrev  0x00000cf1      0x10f build/demo-share/src/task_a.o
+ .debug_abbrev  0x00000e00      0x107 build/demo-share/src/task_b.o
+
+.debug_aranges  0x00000000      0x200
+ .debug_aranges
+                0x00000000       0x20 build/demo-share/boot/startup.o
+ .debug_aranges
+                0x00000020       0x20 build/demo-share/kernel/faults.o
+ .debug_aranges
+                0x00000040       0x20 build/demo-share/kernel/kprintf.o
+ .debug_aranges
+                0x00000060       0x20 build/demo-share/kernel/mpu.o
+ .debug_aranges
+                0x00000080       0x20 build/demo-share/kernel/syscall.o
+ .debug_aranges
+                0x000000a0       0x20 build/demo-share/kernel/task.o
+ .debug_aranges
+                0x000000c0       0x20 build/demo-share/kernel/irq.o
+ .debug_aranges
+                0x000000e0       0x20 build/demo-share/kernel/svc_entry.o
+ .debug_aranges
+                0x00000100       0x20 build/demo-share/drivers/systick.o
+ .debug_aranges
+                0x00000120       0x20 build/demo-share/drivers/uart.o
+ .debug_aranges
+                0x00000140       0x20 build/demo-share/lib/format.o
+ .debug_aranges
+                0x00000160       0x20 build/demo-share/lib/printf.o
+ .debug_aranges
+                0x00000180       0x20 build/demo-share/lib/syscalls.o
+ .debug_aranges
+                0x000001a0       0x20 build/demo-share/src/main.o
+ .debug_aranges
+                0x000001c0       0x20 build/demo-share/src/task_a.o
+ .debug_aranges
+                0x000001e0       0x20 build/demo-share/src/task_b.o
+
+.debug_str      0x00000000     0x4d3d
+ .debug_str     0x00000000     0x4d3d build/demo-share/boot/startup.o
+                                 0x7e (size before relaxing)
+ .debug_str     0x00004d3d        0x0 build/demo-share/kernel/faults.o
+                               0x46fe (size before relaxing)
+ .debug_str     0x00004d3d        0x0 build/demo-share/kernel/kprintf.o
+                               0x3a9d (size before relaxing)
+ .debug_str     0x00004d3d        0x0 build/demo-share/kernel/mpu.o
+                               0x46cc (size before relaxing)
+ .debug_str     0x00004d3d        0x0 build/demo-share/kernel/syscall.o
+                               0x3b12 (size before relaxing)
+ .debug_str     0x00004d3d        0x0 build/demo-share/kernel/task.o
+                               0x3bb9 (size before relaxing)
+ .debug_str     0x00004d3d        0x0 build/demo-share/kernel/irq.o
+                                 0x73 (size before relaxing)
+ .debug_str     0x00004d3d        0x0 build/demo-share/kernel/svc_entry.o
+                                 0x70 (size before relaxing)
+ .debug_str     0x00004d3d        0x0 build/demo-share/drivers/systick.o
+                               0x46d3 (size before relaxing)
+ .debug_str     0x00004d3d        0x0 build/demo-share/drivers/uart.o
+                               0x47a3 (size before relaxing)
+ .debug_str     0x00004d3d        0x0 build/demo-share/lib/format.o
+                               0x3a9c (size before relaxing)
+ .debug_str     0x00004d3d        0x0 build/demo-share/lib/printf.o
+                               0x3b2a (size before relaxing)
+ .debug_str     0x00004d3d        0x0 build/demo-share/lib/syscalls.o
+                                 0x91 (size before relaxing)
+ .debug_str     0x00004d3d        0x0 build/demo-share/src/main.o
+                               0x3955 (size before relaxing)
+ .debug_str     0x00004d3d        0x0 build/demo-share/src/task_a.o
+                               0x399b (size before relaxing)
+ .debug_str     0x00004d3d        0x0 build/demo-share/src/task_b.o
+                               0x39b5 (size before relaxing)
+
+.debug_macro    0x00000000     0x161b
+ .debug_macro   0x00000000       0x46 build/demo-share/kernel/faults.o
+ .debug_macro   0x00000046      0xad8 build/demo-share/kernel/faults.o
+ .debug_macro   0x00000b1e      0x34e build/demo-share/kernel/faults.o
+ .debug_macro   0x00000e6c      0x190 build/demo-share/kernel/faults.o
+ .debug_macro   0x00000ffc      0x22e build/demo-share/kernel/faults.o
+ .debug_macro   0x0000122a       0x4b build/demo-share/kernel/kprintf.o
+ .debug_macro   0x00001275       0x58 build/demo-share/kernel/kprintf.o
+ .debug_macro   0x000012cd       0x46 build/demo-share/kernel/mpu.o
+ .debug_macro   0x00001313       0x60 build/demo-share/kernel/syscall.o
+ .debug_macro   0x00001373       0x28 build/demo-share/kernel/syscall.o
+ .debug_macro   0x0000139b       0x10 build/demo-share/kernel/syscall.o
+ .debug_macro   0x000013ab       0x6d build/demo-share/kernel/task.o
+ .debug_macro   0x00001418       0x52 build/demo-share/drivers/systick.o
+ .debug_macro   0x0000146a       0x56 build/demo-share/drivers/uart.o
+ .debug_macro   0x000014c0       0x37 build/demo-share/lib/format.o
+ .debug_macro   0x000014f7       0x50 build/demo-share/lib/printf.o
+ .debug_macro   0x00001547       0x52 build/demo-share/src/main.o
+ .debug_macro   0x00001599       0x41 build/demo-share/src/task_a.o
+ .debug_macro   0x000015da       0x41 build/demo-share/src/task_b.o
+
+.debug_frame    0x00000000      0x684
+ .debug_frame   0x00000000       0xa0 build/demo-share/kernel/faults.o
+ .debug_frame   0x000000a0       0x70 build/demo-share/kernel/kprintf.o
+ .debug_frame   0x00000110       0x58 build/demo-share/kernel/mpu.o
+ .debug_frame   0x00000168       0xc8 build/demo-share/kernel/syscall.o
+ .debug_frame   0x00000230       0xb4 build/demo-share/kernel/task.o
+ .debug_frame   0x000002e4       0x70 build/demo-share/drivers/systick.o
+ .debug_frame   0x00000354      0x120 build/demo-share/drivers/uart.o
+ .debug_frame   0x00000474       0xc8 build/demo-share/lib/format.o
+ .debug_frame   0x0000053c       0xb8 build/demo-share/lib/printf.o
+ .debug_frame   0x000005f4       0x2c build/demo-share/src/main.o
+ .debug_frame   0x00000620       0x34 build/demo-share/src/task_a.o
+ .debug_frame   0x00000654       0x30 build/demo-share/src/task_b.o

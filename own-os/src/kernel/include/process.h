@@ -12,21 +12,24 @@ typedef struct {
 	int (*entry)(void);
 
 	// partition bounds
-	uint32_t *spart;
-	uint32_t *epart;
+	uintptr_t spart;
+	uintptr_t epart;
 
 	// stack bounds
-	uint32_t *estack;
+	uintptr_t estack;
 
 	// data bounds
-	uint32_t *sidata;
-	uint32_t *sdata;
-	uint32_t *edata;
+	uintptr_t sidata;
+	uintptr_t sdata;
+	uintptr_t edata;
 
 	// bss bounds
-	uint32_t *sbss;
-	uint32_t *ebss;
+	uintptr_t sbss;
+	uintptr_t ebss;
 } process;
+
+// initializes process memory
+void init_process(process *proc);
 
 // starts a process, from thread mode
 void start_process(process *proc);

@@ -35,7 +35,11 @@ typedef struct {
 	volatile uint8_t SHPR[12]; // priority byte of system handlers
 	volatile uint32_t SHCSR;   // system handler control and state
 	volatile uint32_t CFSR;	   // configurable fault status (Mem/Bus/Usage)
-	volatile uint32_t HFSR;	   // HardFault status
+	volatile uint32_t HFSR;	   // hard fault status
+	volatile uint32_t DFSR;    // debug fault status
+	volatile uint32_t MMFAR;   // memory fault address
+	volatile uint32_t BFAR;    // bus fault address
+	volatile uint32_t AFSR;    // auxilliary fault status
 } SCB_TypeDef;
 
 // CPU SCB
@@ -61,6 +65,11 @@ typedef struct {
 #define SCB_CFSR_UNDEFINSTR (1UL << 16) // UsageFault: undefined instruction
 #define SCB_CFSR_INVSTATE (1UL << 17)	// UsageFault: bad EPSR state
 #define SCB_CFSR_DIVBYZERO (1UL << 25)	// UsageFault: divide by zero
+
+#define SCB_CFSR_IACCVIOL (1UL << 0)  // instruction access violation
+#define SCB_CFSR_DACCVIOL (1UL << 1)  // data access violation
+#define SCB_CFSR_MUNSTKERR (1UL << 3) // unstacking fault 
+#define SCB_CFSR_MSTKERR (1UL << 4)   // exception stacking fault 
 
 /* UART */
 

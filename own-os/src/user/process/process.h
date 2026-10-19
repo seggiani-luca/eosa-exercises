@@ -49,33 +49,33 @@ static void init_process_table(void) {
     process_table[0].name = "process_a";
     process_table[0].entry = process_a_main;
 
-    process_table[0].spart = &__process_a_spart;
-    process_table[0].epart = &__process_a_epart;
+    process_table[0].spart = (uintptr_t)&__process_a_spart;
+    process_table[0].epart = (uintptr_t)&__process_a_epart;
     
-    process_table[0].estack = &__process_a_estack;
+    process_table[0].estack = (uintptr_t)&__process_a_estack;
     
-    process_table[0].sidata = &__process_a_sidata;
-    process_table[0].sdata = &__process_a_sdata;
-    process_table[0].edata = &__process_a_edata;
+    process_table[0].sidata = (uintptr_t)&__process_a_sidata;
+    process_table[0].sdata = (uintptr_t)&__process_a_sdata;
+    process_table[0].edata = (uintptr_t)&__process_a_edata;
     
-    process_table[0].sbss = &__process_a_sbss;
-    process_table[0].ebss = &__process_a_ebss;
+    process_table[0].sbss = (uintptr_t)&__process_a_sbss;
+    process_table[0].ebss = (uintptr_t)&__process_a_ebss;
 
     // process_b
     process_table[1].name = "process_b";
     process_table[1].entry = process_b_main;
 
-    process_table[1].spart = &__process_b_spart;
-    process_table[1].epart = &__process_b_epart;
+    process_table[1].spart = (uintptr_t)&__process_b_spart;
+    process_table[1].epart = (uintptr_t)&__process_b_epart;
     
-    process_table[1].estack = &__process_b_estack;
+    process_table[1].estack = (uintptr_t)&__process_b_estack;
     
-    process_table[1].sidata = &__process_b_sidata;
-    process_table[1].sdata = &__process_b_sdata;
-    process_table[1].edata = &__process_b_edata;
+    process_table[1].sidata = (uintptr_t)&__process_b_sidata;
+    process_table[1].sdata = (uintptr_t)&__process_b_sdata;
+    process_table[1].edata = (uintptr_t)&__process_b_edata;
     
-    process_table[1].sbss = &__process_b_sbss;
-    process_table[1].ebss = &__process_b_ebss;
+    process_table[1].sbss = (uintptr_t)&__process_b_sbss;
+    process_table[1].ebss = (uintptr_t)&__process_b_ebss;
 
 }
 

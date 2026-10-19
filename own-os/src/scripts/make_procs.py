@@ -100,17 +100,17 @@ static void init_process_table(void) {{
     process_table[{p["index"]}].name = "{p["name"]}";
     process_table[{p["index"]}].entry = {p["entry"]};
 
-    process_table[{p["index"]}].spart = &{p["spart"]};
-    process_table[{p["index"]}].epart = &{p["epart"]};
+    process_table[{p["index"]}].spart = (uintptr_t)&{p["spart"]};
+    process_table[{p["index"]}].epart = (uintptr_t)&{p["epart"]};
     
-    process_table[{p["index"]}].estack = &{p["estack"]};
+    process_table[{p["index"]}].estack = (uintptr_t)&{p["estack"]};
     
-    process_table[{p["index"]}].sidata = &{p["sidata"]};
-    process_table[{p["index"]}].sdata = &{p["sdata"]};
-    process_table[{p["index"]}].edata = &{p["edata"]};
+    process_table[{p["index"]}].sidata = (uintptr_t)&{p["sidata"]};
+    process_table[{p["index"]}].sdata = (uintptr_t)&{p["sdata"]};
+    process_table[{p["index"]}].edata = (uintptr_t)&{p["edata"]};
     
-    process_table[{p["index"]}].sbss = &{p["sbss"]};
-    process_table[{p["index"]}].ebss = &{p["ebss"]};
+    process_table[{p["index"]}].sbss = (uintptr_t)&{p["sbss"]};
+    process_table[{p["index"]}].ebss = (uintptr_t)&{p["ebss"]};
 
 """)
 

@@ -1,0 +1,469 @@
+
+Merging object attributes
+
+
+Discarded input sections
+
+ .group         0x00000000        0xc build/kernel/faults.o
+ .group         0x00000000        0xc build/kernel/faults.o
+ .group         0x00000000        0xc build/kernel/faults.o
+ .group         0x00000000        0xc build/kernel/faults.o
+ .group         0x00000000        0xc build/kernel/kprintf.o
+ .group         0x00000000        0xc build/kernel/kprintf.o
+ .group         0x00000000        0xc build/kernel/kprintf.o
+ .debug_macro   0x00000000      0xad2 build/kernel/kprintf.o
+ .debug_macro   0x00000000      0x34e build/kernel/kprintf.o
+ .group         0x00000000        0xc build/kernel/syscall.o
+ .group         0x00000000        0xc build/kernel/syscall.o
+ .group         0x00000000        0xc build/kernel/syscall.o
+ .group         0x00000000        0xc build/kernel/syscall.o
+ .debug_macro   0x00000000      0xad2 build/kernel/syscall.o
+ .debug_macro   0x00000000      0x34e build/kernel/syscall.o
+ .group         0x00000000        0xc build/drivers/systick.o
+ .group         0x00000000        0xc build/drivers/systick.o
+ .group         0x00000000        0xc build/drivers/systick.o
+ .group         0x00000000        0xc build/drivers/systick.o
+ .debug_macro   0x00000000      0xad2 build/drivers/systick.o
+ .debug_macro   0x00000000      0x34e build/drivers/systick.o
+ .debug_macro   0x00000000      0x190 build/drivers/systick.o
+ .debug_macro   0x00000000      0x1a1 build/drivers/systick.o
+ .group         0x00000000        0xc build/drivers/timer.o
+ .group         0x00000000        0xc build/drivers/timer.o
+ .group         0x00000000        0xc build/drivers/timer.o
+ .group         0x00000000        0xc build/drivers/timer.o
+ .debug_macro   0x00000000      0xad2 build/drivers/timer.o
+ .debug_macro   0x00000000      0x34e build/drivers/timer.o
+ .debug_macro   0x00000000      0x190 build/drivers/timer.o
+ .debug_macro   0x00000000      0x1a1 build/drivers/timer.o
+ .group         0x00000000        0xc build/drivers/uart.o
+ .group         0x00000000        0xc build/drivers/uart.o
+ .group         0x00000000        0xc build/drivers/uart.o
+ .group         0x00000000        0xc build/drivers/uart.o
+ .debug_macro   0x00000000      0xad2 build/drivers/uart.o
+ .debug_macro   0x00000000      0x34e build/drivers/uart.o
+ .debug_macro   0x00000000      0x190 build/drivers/uart.o
+ .debug_macro   0x00000000      0x1a1 build/drivers/uart.o
+ .group         0x00000000        0xc build/lib/format.o
+ .group         0x00000000        0xc build/lib/format.o
+ .group         0x00000000        0xc build/lib/format.o
+ .debug_macro   0x00000000      0xad2 build/lib/format.o
+ .debug_macro   0x00000000       0x58 build/lib/format.o
+ .debug_macro   0x00000000      0x34e build/lib/format.o
+ .group         0x00000000        0xc build/lib/printf.o
+ .group         0x00000000        0xc build/lib/printf.o
+ .group         0x00000000        0xc build/lib/printf.o
+ .group         0x00000000        0xc build/lib/printf.o
+ .debug_macro   0x00000000      0xad2 build/lib/printf.o
+ .debug_macro   0x00000000       0x58 build/lib/printf.o
+ .debug_macro   0x00000000      0x34e build/lib/printf.o
+ .debug_macro   0x00000000       0x1c build/lib/printf.o
+ .group         0x00000000        0xc build/src/app.o
+ .group         0x00000000        0xc build/src/app.o
+ .group         0x00000000        0xc build/src/app.o
+ .debug_macro   0x00000000      0xad2 build/src/app.o
+ .debug_macro   0x00000000      0x34e build/src/app.o
+ .debug_macro   0x00000000       0x1c build/src/app.o
+ .group         0x00000000        0xc build/src/main.o
+ .group         0x00000000        0xc build/src/main.o
+ .group         0x00000000        0xc build/src/main.o
+ .debug_macro   0x00000000      0xad2 build/src/main.o
+ .debug_macro   0x00000000      0x34e build/src/main.o
+ .debug_macro   0x00000000       0x10 build/src/main.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x00000000         0x00400000         xr
+RAM              0x20000000         0x00400000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD /usr/lib/gcc/arm-none-eabi/16.2.0/thumb/v7-m/nofp/libgcc.a
+LOAD build/boot/startup.o
+LOAD build/kernel/faults.o
+LOAD build/kernel/kprintf.o
+LOAD build/kernel/syscall.o
+LOAD build/kernel/irq.o
+LOAD build/kernel/svc_entry.o
+LOAD build/drivers/systick.o
+LOAD build/drivers/timer.o
+LOAD build/drivers/uart.o
+LOAD build/lib/format.o
+LOAD build/lib/printf.o
+LOAD build/lib/syscalls.o
+LOAD build/src/app.o
+LOAD build/src/main.o
+                0x20400000                        _estack = (ORIGIN (RAM) + LENGTH (RAM))
+                0x00001000                        _Min_Stack_Size = 0x1000
+                0x00001000                        _Min_Heap_Size = 0x1000
+
+.isr_vector     0x00000000       0xc0
+                0x00000000                        . = ALIGN (0x4)
+ *(.isr_vector)
+ .isr_vector    0x00000000       0xc0 build/boot/startup.o
+                0x00000000                isr_vector
+                0x000000c0                        . = ALIGN (0x4)
+
+.text           0x000000c0      0xbcc
+                0x000000c0                        . = ALIGN (0x4)
+ *(.text*)
+ .text          0x000000c0       0x90 build/boot/startup.o
+                0x000000c0                Reset_Handler
+                0x0000014c                DebugMon_Handler
+                0x0000014c                UART2RX_Handler
+                0x0000014c                PendSV_Handler
+                0x0000014c                NMI_Handler
+                0x0000014c                UART1TX_Handler
+                0x0000014c                TIMER1_Handler
+                0x0000014c                UART2TX_Handler
+                0x0000014c                UARTOVF_Handler
+                0x0000014c                Default_Handler
+                0x0000014c                UART1RX_Handler
+                0x0000014c                DUALTIMER_Handler
+ .text          0x00000150       0x88 build/kernel/faults.o
+                0x00000158                HardFault_Handler
+                0x00000178                MemManage_Handler
+                0x00000198                BusFault_Handler
+                0x000001b8                UsageFault_Handler
+ .text          0x000001d8       0x48 build/kernel/kprintf.o
+                0x000001f4                kprintf
+ .text          0x00000220       0xb4 build/kernel/syscall.o
+                0x0000027a                svc_dispatch
+ .text          0x000002d4        0xe build/kernel/irq.o
+                0x000002d4                irq_save
+                0x000002dc                irq_restore
+ .text          0x000002e2        0x8 build/kernel/svc_entry.o
+                0x000002e2                SVC_Handler
+ *fill*         0x000002ea        0x2 
+ .text          0x000002ec       0x60 build/drivers/systick.o
+                0x000002ec                systick_init
+                0x0000031c                SysTick_Handler
+                0x00000338                systick_uptime_ms
+ .text          0x0000034c       0xa4 build/drivers/timer.o
+                0x0000034c                timer0_init
+                0x000003a0                TIMER0_Handler
+ .text          0x000003f0      0x368 build/drivers/uart.o
+                0x00000534                uart_init
+                0x000005b4                uart_putc_polled
+                0x000005e0                uart_getc_polled
+                0x00000608                uart_write
+                0x000006b8                uart_getc
+                0x000006ec                UART0TX_Handler
+                0x00000730                UART0RX_Handler
+ .text          0x00000758      0x288 build/lib/format.o
+                0x000007f2                utoa_dec
+                0x00000810                utoa_hex
+                0x00000860                vformat
+ .text          0x000009e0      0x104 build/lib/printf.o
+                0x000009e0                write_all
+                0x00000a70                printf
+                0x00000ab8                sleep_ms
+ .text          0x00000ae4        0xc build/lib/syscalls.o
+                0x00000ae4                sys_write
+                0x00000ae8                sys_read
+                0x00000aec                sys_uptime
+ .text          0x00000af0       0x5c build/src/app.o
+                0x00000af0                app_main
+ .text          0x00000b4c       0x40 build/src/main.o
+                0x00000b4c                main
+ *(.rodata*)
+ .rodata        0x00000b8c       0x5f build/kernel/faults.o
+ *fill*         0x00000beb        0x1 
+ .rodata        0x00000bec       0x10 build/kernel/syscall.o
+ .rodata        0x00000bfc        0xb build/drivers/timer.o
+ *fill*         0x00000c07        0x1 
+ .rodata        0x00000c08        0x7 build/lib/format.o
+ *fill*         0x00000c0f        0x1 
+ .rodata        0x00000c10       0x3d build/src/app.o
+ *fill*         0x00000c4d        0x3 
+ .rodata        0x00000c50       0x3b build/src/main.o
+                0x00000c8c                        . = ALIGN (0x4)
+ *fill*         0x00000c8b        0x1 
+                0x00000c8c                        _etext = .
+                0x00000c8c                        _sidata = LOADADDR (.data)
+
+.glue_7         0x00000c8c        0x0
+ .glue_7        0x00000c8c        0x0 linker stubs
+
+.glue_7t        0x00000c8c        0x0
+ .glue_7t       0x00000c8c        0x0 linker stubs
+
+.vfp11_veneer   0x00000c8c        0x0
+ .vfp11_veneer  0x00000c8c        0x0 linker stubs
+
+.v4_bx          0x00000c8c        0x0
+ .v4_bx         0x00000c8c        0x0 linker stubs
+
+.iplt           0x00000c8c        0x0
+ .iplt          0x00000c8c        0x0 build/boot/startup.o
+
+.rel.dyn        0x00000c8c        0x0
+ .rel.iplt      0x00000c8c        0x0 build/boot/startup.o
+
+.data           0x20000000        0x0 load address 0x00000c8c
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _sdata = .
+ *(.data*)
+ .data          0x20000000        0x0 build/boot/startup.o
+ .data          0x20000000        0x0 build/kernel/faults.o
+ .data          0x20000000        0x0 build/kernel/kprintf.o
+ .data          0x20000000        0x0 build/kernel/syscall.o
+ .data          0x20000000        0x0 build/kernel/irq.o
+ .data          0x20000000        0x0 build/kernel/svc_entry.o
+ .data          0x20000000        0x0 build/drivers/systick.o
+ .data          0x20000000        0x0 build/drivers/timer.o
+ .data          0x20000000        0x0 build/drivers/uart.o
+ .data          0x20000000        0x0 build/lib/format.o
+ .data          0x20000000        0x0 build/lib/printf.o
+ .data          0x20000000        0x0 build/lib/syscalls.o
+ .data          0x20000000        0x0 build/src/app.o
+ .data          0x20000000        0x0 build/src/main.o
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _edata = .
+
+.igot.plt       0x20000000        0x0 load address 0x00000c8c
+ .igot.plt      0x20000000        0x0 build/boot/startup.o
+
+.bss            0x20000000       0x9c load address 0x00000c8c
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _sbss = .
+ *(.bss*)
+ .bss           0x20000000        0x0 build/boot/startup.o
+ .bss           0x20000000        0x0 build/kernel/faults.o
+ .bss           0x20000000        0x0 build/kernel/kprintf.o
+ .bss           0x20000000        0x0 build/kernel/syscall.o
+ .bss           0x20000000        0x0 build/kernel/irq.o
+ .bss           0x20000000        0x0 build/kernel/svc_entry.o
+ .bss           0x20000000        0x4 build/drivers/systick.o
+ .bss           0x20000004        0x4 build/drivers/timer.o
+ .bss           0x20000008       0x94 build/drivers/uart.o
+ .bss           0x2000009c        0x0 build/lib/format.o
+ .bss           0x2000009c        0x0 build/lib/printf.o
+ .bss           0x2000009c        0x0 build/lib/syscalls.o
+ .bss           0x2000009c        0x0 build/src/app.o
+ .bss           0x2000009c        0x0 build/src/main.o
+ *(COMMON)
+                0x2000009c                        . = ALIGN (0x4)
+                0x2000009c                        _ebss = .
+
+.heap           0x2000009c     0x1004 load address 0x00000c8c
+                0x200000a0                        . = ALIGN (0x8)
+ *fill*         0x2000009c        0x4 
+                [!provide]                        PROVIDE (end = .)
+                [!provide]                        PROVIDE (_end = .)
+                0x200000a0                        _heap_bottom = .
+                0x200010a0                        . = (. + _Min_Heap_Size)
+ *fill*         0x200000a0     0x1000 
+                0x200010a0                        _heap_top = .
+                0x203ff000                        __StackLimit = (_estack - _Min_Stack_Size)
+                0x00000001                        ASSERT ((__StackLimit >= _heap_top), region RAM overflowed: heap collides with the stack)
+OUTPUT(build/scratch-os.axf elf32-littlearm)
+LOAD linker stubs
+
+.ARM.attributes
+                0x00000000       0x2f
+ .ARM.attributes
+                0x00000000       0x21 build/boot/startup.o
+ .ARM.attributes
+                0x00000021       0x2d build/kernel/faults.o
+ .ARM.attributes
+                0x0000004e       0x2d build/kernel/kprintf.o
+ .ARM.attributes
+                0x0000007b       0x2d build/kernel/syscall.o
+ .ARM.attributes
+                0x000000a8       0x21 build/kernel/irq.o
+ .ARM.attributes
+                0x000000c9       0x21 build/kernel/svc_entry.o
+ .ARM.attributes
+                0x000000ea       0x2d build/drivers/systick.o
+ .ARM.attributes
+                0x00000117       0x2d build/drivers/timer.o
+ .ARM.attributes
+                0x00000144       0x2d build/drivers/uart.o
+ .ARM.attributes
+                0x00000171       0x2d build/lib/format.o
+ .ARM.attributes
+                0x0000019e       0x2d build/lib/printf.o
+ .ARM.attributes
+                0x000001cb       0x21 build/lib/syscalls.o
+ .ARM.attributes
+                0x000001ec       0x2d build/src/app.o
+ .ARM.attributes
+                0x00000219       0x2d build/src/main.o
+
+.comment        0x00000000       0x1e
+ .comment       0x00000000       0x1e build/kernel/faults.o
+                                 0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 build/kernel/kprintf.o
+                                 0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 build/kernel/syscall.o
+                                 0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 build/drivers/systick.o
+                                 0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 build/drivers/timer.o
+                                 0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 build/drivers/uart.o
+                                 0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 build/lib/format.o
+                                 0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 build/lib/printf.o
+                                 0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 build/src/app.o
+                                 0x1f (size before relaxing)
+ .comment       0x0000001e        0x0 build/src/main.o
+                                 0x1f (size before relaxing)
+
+.debug_line     0x00000000      0xde9
+ .debug_line    0x00000000       0xa2 build/boot/startup.o
+ .debug_line    0x000000a2       0xed build/kernel/faults.o
+ .debug_line    0x0000018f       0xec build/kernel/kprintf.o
+ .debug_line    0x0000027b      0x12e build/kernel/syscall.o
+ .debug_line    0x000003a9       0x4f build/kernel/irq.o
+ .debug_line    0x000003f8       0x4a build/kernel/svc_entry.o
+ .debug_line    0x00000442       0xe5 build/drivers/systick.o
+ .debug_line    0x00000527      0x107 build/drivers/timer.o
+ .debug_line    0x0000062e      0x2a1 build/drivers/uart.o
+ .debug_line    0x000008cf      0x1c9 build/lib/format.o
+ .debug_line    0x00000a98      0x146 build/lib/printf.o
+ .debug_line    0x00000bde       0x52 build/lib/syscalls.o
+ .debug_line    0x00000c30       0xd6 build/src/app.o
+ .debug_line    0x00000d06       0xe3 build/src/main.o
+
+.debug_line_str
+                0x00000000       0x79
+ .debug_line_str
+                0x00000000       0x79 build/boot/startup.o
+                                 0x51 (size before relaxing)
+ .debug_line_str
+                0x00000079        0x0 build/kernel/irq.o
+                                 0x4f (size before relaxing)
+ .debug_line_str
+                0x00000079        0x0 build/kernel/svc_entry.o
+                                 0x55 (size before relaxing)
+ .debug_line_str
+                0x00000079        0x0 build/lib/syscalls.o
+                                 0x51 (size before relaxing)
+
+.debug_info     0x00000000     0x1504
+ .debug_info    0x00000000       0x3e build/boot/startup.o
+ .debug_info    0x0000003e      0x1af build/kernel/faults.o
+ .debug_info    0x000001ed      0x15d build/kernel/kprintf.o
+ .debug_info    0x0000034a      0x239 build/kernel/syscall.o
+ .debug_info    0x00000583       0x3c build/kernel/irq.o
+ .debug_info    0x000005bf       0x31 build/kernel/svc_entry.o
+ .debug_info    0x000005f0      0x11a build/drivers/systick.o
+ .debug_info    0x0000070a      0x24a build/drivers/timer.o
+ .debug_info    0x00000954      0x44d build/drivers/uart.o
+ .debug_info    0x00000da1      0x2be build/lib/format.o
+ .debug_info    0x0000105f      0x263 build/lib/printf.o
+ .debug_info    0x000012c2       0x47 build/lib/syscalls.o
+ .debug_info    0x00001309      0x119 build/src/app.o
+ .debug_info    0x00001422       0xe2 build/src/main.o
+
+.debug_abbrev   0x00000000      0xc49
+ .debug_abbrev  0x00000000       0x28 build/boot/startup.o
+ .debug_abbrev  0x00000028       0xf2 build/kernel/faults.o
+ .debug_abbrev  0x0000011a       0xf6 build/kernel/kprintf.o
+ .debug_abbrev  0x00000210      0x139 build/kernel/syscall.o
+ .debug_abbrev  0x00000349       0x28 build/kernel/irq.o
+ .debug_abbrev  0x00000371       0x28 build/kernel/svc_entry.o
+ .debug_abbrev  0x00000399       0xc2 build/drivers/systick.o
+ .debug_abbrev  0x0000045b      0x133 build/drivers/timer.o
+ .debug_abbrev  0x0000058e      0x1fe build/drivers/uart.o
+ .debug_abbrev  0x0000078c      0x156 build/lib/format.o
+ .debug_abbrev  0x000008e2      0x1b9 build/lib/printf.o
+ .debug_abbrev  0x00000a9b       0x28 build/lib/syscalls.o
+ .debug_abbrev  0x00000ac3       0xe4 build/src/app.o
+ .debug_abbrev  0x00000ba7       0xa2 build/src/main.o
+
+.debug_aranges  0x00000000      0x1c0
+ .debug_aranges
+                0x00000000       0x20 build/boot/startup.o
+ .debug_aranges
+                0x00000020       0x20 build/kernel/faults.o
+ .debug_aranges
+                0x00000040       0x20 build/kernel/kprintf.o
+ .debug_aranges
+                0x00000060       0x20 build/kernel/syscall.o
+ .debug_aranges
+                0x00000080       0x20 build/kernel/irq.o
+ .debug_aranges
+                0x000000a0       0x20 build/kernel/svc_entry.o
+ .debug_aranges
+                0x000000c0       0x20 build/drivers/systick.o
+ .debug_aranges
+                0x000000e0       0x20 build/drivers/timer.o
+ .debug_aranges
+                0x00000100       0x20 build/drivers/uart.o
+ .debug_aranges
+                0x00000120       0x20 build/lib/format.o
+ .debug_aranges
+                0x00000140       0x20 build/lib/printf.o
+ .debug_aranges
+                0x00000160       0x20 build/lib/syscalls.o
+ .debug_aranges
+                0x00000180       0x20 build/src/app.o
+ .debug_aranges
+                0x000001a0       0x20 build/src/main.o
+
+.debug_str      0x00000000     0x48d0
+ .debug_str     0x00000000     0x48d0 build/boot/startup.o
+                                 0x7b (size before relaxing)
+ .debug_str     0x000048d0        0x0 build/kernel/faults.o
+                               0x4493 (size before relaxing)
+ .debug_str     0x000048d0        0x0 build/kernel/kprintf.o
+                               0x3a8d (size before relaxing)
+ .debug_str     0x000048d0        0x0 build/kernel/syscall.o
+                               0x3a04 (size before relaxing)
+ .debug_str     0x000048d0        0x0 build/kernel/irq.o
+                                 0x70 (size before relaxing)
+ .debug_str     0x000048d0        0x0 build/kernel/svc_entry.o
+                                 0x6d (size before relaxing)
+ .debug_str     0x000048d0        0x0 build/drivers/systick.o
+                               0x4478 (size before relaxing)
+ .debug_str     0x000048d0        0x0 build/drivers/timer.o
+                               0x44df (size before relaxing)
+ .debug_str     0x000048d0        0x0 build/drivers/uart.o
+                               0x45a8 (size before relaxing)
+ .debug_str     0x000048d0        0x0 build/lib/format.o
+                               0x3a8c (size before relaxing)
+ .debug_str     0x000048d0        0x0 build/lib/printf.o
+                               0x3afd (size before relaxing)
+ .debug_str     0x000048d0        0x0 build/lib/syscalls.o
+                                 0x7b (size before relaxing)
+ .debug_str     0x000048d0        0x0 build/src/app.o
+                               0x3963 (size before relaxing)
+ .debug_str     0x000048d0        0x0 build/src/main.o
+                               0x3970 (size before relaxing)
+
+.debug_macro    0x00000000     0x14dd
+ .debug_macro   0x00000000       0x46 build/kernel/faults.o
+ .debug_macro   0x00000046      0xad2 build/kernel/faults.o
+ .debug_macro   0x00000b18      0x34e build/kernel/faults.o
+ .debug_macro   0x00000e66      0x190 build/kernel/faults.o
+ .debug_macro   0x00000ff6      0x1a1 build/kernel/faults.o
+ .debug_macro   0x00001197       0x4b build/kernel/kprintf.o
+ .debug_macro   0x000011e2       0x58 build/kernel/kprintf.o
+ .debug_macro   0x0000123a       0x50 build/kernel/syscall.o
+ .debug_macro   0x0000128a       0x1c build/kernel/syscall.o
+ .debug_macro   0x000012a6       0x10 build/kernel/syscall.o
+ .debug_macro   0x000012b6       0x52 build/drivers/systick.o
+ .debug_macro   0x00001308       0x56 build/drivers/timer.o
+ .debug_macro   0x0000135e       0x5c build/drivers/uart.o
+ .debug_macro   0x000013ba       0x37 build/lib/format.o
+ .debug_macro   0x000013f1       0x50 build/lib/printf.o
+ .debug_macro   0x00001441       0x41 build/src/app.o
+ .debug_macro   0x00001482       0x5b build/src/main.o
+
+.debug_frame    0x00000000      0x638
+ .debug_frame   0x00000000       0x98 build/kernel/faults.o
+ .debug_frame   0x00000098       0x70 build/kernel/kprintf.o
+ .debug_frame   0x00000108       0xa0 build/kernel/syscall.o
+ .debug_frame   0x000001a8       0x70 build/drivers/systick.o
+ .debug_frame   0x00000218       0x54 build/drivers/timer.o
+ .debug_frame   0x0000026c      0x1f0 build/drivers/uart.o
+ .debug_frame   0x0000045c       0xc8 build/lib/format.o
+ .debug_frame   0x00000524       0xb8 build/lib/printf.o
+ .debug_frame   0x000005dc       0x30 build/src/app.o
+ .debug_frame   0x0000060c       0x2c build/src/main.o

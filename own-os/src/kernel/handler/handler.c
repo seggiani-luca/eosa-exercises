@@ -1,8 +1,25 @@
 #include "../include/cmsdk.h"
 #include "../include/log.h"
 
+void handler_init() {
+	// (unrelated) allow devices over SVC
+	SCB->SHPR[7] = 0xE0;
+
+	// enable all fault types
+	SCB->SHCSR |= SCB_SHCSR_MEMFAULTENA
+	           |  SCB_SHCSR_BUSFAULTENA
+	           |  SCB_SHCSR_USGFAULTENA; 
+}
+
 void NMI_Handler() {
 	kprintf("NMI fault\n");
+
+    uint32_t status = CMSDK_WDOG->RIS;
+	if(status) {
+		kprintf("watchdog fired \n");
+		kprintf("reset will follow if not handled \n");
+	}
+
 	while (1)
 		;
 }
@@ -24,7 +41,21 @@ void HardFault_Handler() {
 
 void Memory_Handler() {
 	kprintf("MemManage fault\n");
+	kprintf("MMFAR: %x\n", SCB->MMFAR);
 	kprintf("CFSR: %x\n", SCB->CFSR);
+
+	if(SCB->CFSR & SCB_CFSR_IACCVIOL)
+		kprintf("instruction access violation\n");
+	
+	if(SCB->CFSR & SCB_CFSR_DACCVIOL)
+		kprintf("data access violation\n");
+	
+	if(SCB->CFSR & SCB_CFSR_MUNSTKERR)
+		kprintf("fault while unstacking\n");
+	
+	if(SCB->CFSR & SCB_CFSR_MSTKERR)
+		kprintf("fault while stacking (exception)\n");
+
 	while (1)
 		;
 }

@@ -1,6 +1,7 @@
 #include "../user/process/process.h"
 #include "include/cmsdk.h"
 #include "include/log.h"
+#include "include/handler.h"
 #include "include/memory.h"
 #include "include/serial.h"
 #include "include/systick.h"
@@ -8,18 +9,9 @@
 #include "include/watchdog.h"
 #include "include/wfi.h"
 
-// initalization routines, in startup
-extern void Data_Init(uint32_t *start, uint32_t *end, const uint32_t *source);
-extern void Bss_Init(uint32_t *start, uint32_t *end);
-
-void init_process(process *proc) {
-	Data_Init(proc->sdata, proc->edata, proc->sidata);
-	Bss_Init(proc->sbss, proc->ebss);
-}
-
 int kernel_main(void) {
-	// allow devices over SVC
-	SCB->SHPR[7] = 0xE0;
+	// initialize fault and SVC handlers
+	handler_init();
 
 	// init SysTick timer
 	systick_init(0, 10);
@@ -46,12 +38,12 @@ int kernel_main(void) {
 				   0			 // no srd
 	);
 
+	// initialize process table
+	init_process_table();
+
 	// greet the user
 	kprintf("\nBooting into own-os v.0.0\n");
 	kprintf("Luca Seggiani - 2026\n\n");
-
-	// initialize process table
-	init_process_table();
 
 	// initialize processes
 	for (unsigned int i = 0; i < NUM_PROCESSES; i++) {
