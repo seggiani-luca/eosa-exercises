@@ -16,6 +16,4 @@ They are under the MIT licence, I didn't write them, and I don't take any respon
 `own-os` is a replica of the official course OS I'm working on in my spare time.
 I try to reimplement what's in the official material, expanding on topics i find interesting / I think I need more practice on.
 
-Features for now (updated lazily are):
-- Boots into C code from ARM assembly;
-- Implements a tiny subset of libc I/O via QEMU semihosting (`printf()` and `fgets()` available, plus some helpers such as `atoi()`).
+A README is available in that dir if you're curious.
