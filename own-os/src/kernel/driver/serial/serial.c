@@ -91,8 +91,8 @@ void uart_init(void *ctx) {
 	// set baud divider
 	bl->uart->BAUDDIV = 16;
 
-	// start transmitter and receiver
-	bl->uart->CTRL = UART_CTRL_TXEN | UART_CTRL_RXEN;
+	// start transmitter
+	bl->uart->CTRL = UART_CTRL_TXEN;
 
 	// clean buffers
 	bl->tx_buf.head = bl->tx_buf.tail = 0;
@@ -173,11 +173,11 @@ unsigned int uart_read(void *ctx, char *buf, unsigned int len) {
 	// start if idle
 	if (!bl->rx_busy) {
 		// start reception
-		bl->uart->CTRL |= UART_CTRL_RXIRQEN;
+		bl->uart->CTRL |= UART_CTRL_RXIRQEN | UART_CTRL_RXEN;
 		bl->rx_busy = 1;
 	}
 
-	// if nothing yet, block
+	// if nothing yet, block (will return first char from handler)
 	if (sbuf_empty(&bl->rx_buf)) {
 		current->state = PROC_BLOCKED;
 		process_queue_push(&bl->rx_queue, current);
@@ -215,7 +215,7 @@ void UART0TX_Handler(void) {
 // serial reception handler 0
 void UART0RX_Handler(void) {
 	// get char
-	char c = (char)(CMSDK_UART0->DATA & 0xFF);		
+	char c = (char)(CMSDK_UART0->DATA & 0xFF);
 
 	if(uart0.rx_queue) {
 		// process blocked on first character, feed
@@ -233,7 +233,7 @@ void UART0RX_Handler(void) {
 
 	// if full, stop the serial interface
 	if (sbuf_full(&uart0.rx_buf)) {
-		CMSDK_UART0->CTRL &= ~UART_CTRL_RXIRQEN;
+		CMSDK_UART0->CTRL &= ~UART_CTRL_RXIRQEN & ~UART_CTRL_RXEN;
 		uart0.rx_busy = 0;
 	}
 
@@ -275,7 +275,7 @@ void UART1RX_Handler(void) {
 
 	// if full, stop the serial interface
 	if (sbuf_full(&uart1.rx_buf)) {
-		CMSDK_UART1->CTRL &= ~UART_CTRL_RXIRQEN;
+		CMSDK_UART1->CTRL &= ~UART_CTRL_RXIRQEN & ~UART_CTRL_RXEN;
 		uart1.rx_busy = 0;
 	}
 
@@ -317,7 +317,7 @@ void UART2RX_Handler(void) {
 
 	// if full, stop the serial interface
 	if (sbuf_full(&uart2.rx_buf)) {
-		CMSDK_UART2->CTRL &= ~UART_CTRL_RXIRQEN;
+		CMSDK_UART2->CTRL &= ~UART_CTRL_RXIRQEN & ~UART_CTRL_RXEN;
 		uart2.rx_busy = 0;
 	}
 
