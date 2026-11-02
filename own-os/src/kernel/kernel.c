@@ -46,6 +46,8 @@ int kernel_main(void) {
 
 	// init SysTick timer now, as it starts round robin
 	systick_init(0, 100);
+
+	// bootstrap first process
 	start_process();
 
 	for (;;)

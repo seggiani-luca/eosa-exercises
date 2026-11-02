@@ -74,6 +74,7 @@ void vformat(vputc out, void *ctx, const char *fmt, va_list ap) {
 			break;
 
 		case 'x':
+		case 'p':
 			xformat(out, ctx, va_arg(ap, uint32_t));
 			break;
 

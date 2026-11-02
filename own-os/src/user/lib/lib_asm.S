@@ -21,3 +21,21 @@ fread:
 tick:
     svc #SYS_TICK
     bx lr
+
+.global delay
+.thumb_func
+delay:
+    svc #SYS_DELAY
+    bx lr
+
+.global yield
+.thumb_func
+yield:
+    svc #SYS_YIELD
+    bx lr
+
+.global terminate
+.thumb_func
+terminate:
+	svc #SYS_EXIT_PROC
+	bx lr

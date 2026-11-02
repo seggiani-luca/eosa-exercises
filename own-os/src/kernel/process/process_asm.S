@@ -17,31 +17,24 @@ context_out:
     stmdb r0!, {r4-r11}
 
     ldr   r1, =current
-    ldr   r1, [r1]              
+	ldr   r1, [r1] 
+    str   r0, [r1]
 
-    ldr   r2, =process_table
-    add   r2, r2, r1, lsl #4
-    add   r2, r2, r1, lsl #5   
-    str   r0, [r2]              
+    adds  r0, #32
 
-    bx    lr
-
+	bx    lr
 
 .global context_in
 .thumb_func
 context_in:
     ldr   r0, =current
+	ldr   r0, [r0] 
     ldr   r0, [r0]             
-
-    ldr   r1, =process_table
-    add   r1, r1, r0, lsl #4
-    add   r1, r1, r0, lsl #5   
-    ldr   r0, [r1]             
 
     ldmia r0!, {r4-r11}
     msr   psp, r0
 
-    ldr   lr, =EXC_RETURN_THREAD_PSP
+    ldr   r0, =EXC_RETURN_THREAD_PSP
     bx    lr
 
 .global start_process 

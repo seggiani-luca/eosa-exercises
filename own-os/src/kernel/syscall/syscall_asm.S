@@ -5,9 +5,10 @@
 .section .text
 
 .extern dispatch_syscall
-.extern start_process_post
 .extern priv_down 
 .extern context_in 
+.extern context_out
+.extern exit_process_post
 
 .global SVC_Handler 
 .thumb_func
@@ -15,8 +16,8 @@ SVC_Handler:
 	// from handler or thread?
 	tst lr, #4
 	ite eq
-	mrseq r0, msp // get handler pointer
-	mrsne r0, psp // get stack pointer
+	mrseq r0, msp    // get handler pointer
+	blne context_out // get thread pointer, save context
 
 	// get svc syscall number
 	ldr r1, [r0, #24]
@@ -24,21 +25,11 @@ SVC_Handler:
 	ldrh r1, [r1]
 	uxtb r1, r1
 
-	// have to start process?
-    cmp  r1, #SYS_START_PROC
-    bne  SVC_Handler_Dispatch
-	
-	bl priv_down
-	bl context_in
-
-    bx   r0
-
-SVC_Handler_Dispatch:
-
-	// get exc_return
-	mov r2, lr
-
+	// handle syscall
 	bl dispatch_syscall
+
+	// restore context
+	bl context_in
 
 	// return
 	bx r0

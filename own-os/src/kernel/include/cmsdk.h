@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #define EXC_RETURN_THREAD_PSP 0xFFFFFFFDu // thread return code
-#define XPSR_THUMB 0x01000000u // XPSR thumb flag
+#define XPSR_THUMB 0x01000000u			  // XPSR thumb flag
 
 #define NVIC_SERIAL_PRIO 0xC0
 #define NVIC_TIMER_PRIO 0xC0

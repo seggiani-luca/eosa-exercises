@@ -7,14 +7,23 @@
 
 /* syscalls */
 
-// writes a buffer to a device
-unsigned int fwrite(int dev, const char *buf, unsigned int len);
+// request write to a character device
+extern unsigned int fwrite(int dev, const char *buf, unsigned int len);
 
-// reads a buffer from a device
-unsigned int fread(int dev, char *buf, unsigned int len);
+// request read from a character device
+extern unsigned int fread(int dev, char *buf, unsigned int len);
 
-// gets tick from timer device
-int tick(int dev);
+// request counted ms from a timer
+extern int tick(int dev);
+
+// block, sleeping on a timer for given ms
+extern void delay(int dev, unsigned int ms);
+
+// yield control to scheduler
+extern void yield();
+
+// terminate this process
+extern void terminate();
 
 /* format */
 
@@ -92,6 +101,7 @@ int atoi(const char *s);
 
 /* time */
 
-void sleep(unsigned int ms);
+// delay on systick
+#define sleep(ms) delay(SYS_SYSTICK, (ms))
 
 #endif

@@ -1,4 +1,6 @@
 #include "../../syscall.h"
+#include "../include/control.h"
+#include "../include/delay.h"
 #include "../include/log.h"
 #include "../include/process.h"
 #include "../include/semihost.h"
@@ -22,6 +24,7 @@ typedef struct {
 	uint32_t xpsr;
 } exception_frame;
 
+// get character device from id
 char_driver *get_char_dev(int dev) {
 	switch (dev) {
 	case SYS_SERIAL0:
@@ -38,6 +41,7 @@ char_driver *get_char_dev(int dev) {
 	}
 }
 
+// get timer device from id
 timer_driver *get_timer_dev(int dev) {
 	switch (dev) {
 	case SYS_SYSTICK:
@@ -48,6 +52,21 @@ timer_driver *get_timer_dev(int dev) {
 		return &timer1_driver;
 	default:
 		kprintf("Invalid timer device\n");
+		return 0;
+	}
+}
+
+// get timer queue from id
+timer_queue *get_timer_queue(int dev) {
+	switch (dev) {
+	case SYS_SYSTICK:
+		return &systick_queue;
+	case SYS_TIMER0:
+		return &timer0_queue;
+	case SYS_TIMER1:
+		return &timer1_queue;
+	default:
+		kprintf("Invalid timer queue\n");
 		return 0;
 	}
 }
@@ -78,22 +97,58 @@ syscall_ret syscall_tick(syscall_arg dev,
 	return driver->tick(driver->ctx);
 }
 
+syscall_ret syscall_delay(syscall_arg dev, syscall_arg ms,
+						  syscall_arg arg2 __attribute__((unused))) {
+	timer_queue *queue = get_timer_queue(dev);
+	if (!queue)
+		return -1;
+
+	timer_queue_push(queue, current, ms);
+	scheduler();
+
+	return 0;
+}
+
+syscall_ret syscall_yield(syscall_arg arg0 __attribute__((unused)),
+						  syscall_arg arg1 __attribute__((unused)),
+						  syscall_arg arg2 __attribute__((unused))) {
+	scheduler();
+
+	return 0;
+}
+
+syscall_ret syscall_start_proc(syscall_arg arg0 __attribute__((unused)),
+							   syscall_arg arg1 __attribute__((unused)),
+							   syscall_arg arg2 __attribute__((unused))) {
+	priv_down();
+
+	return 0;
+}
+
+syscall_ret syscall_exit_proc(syscall_arg arg0 __attribute__((unused)),
+							  syscall_arg arg1 __attribute__((unused)),
+							  syscall_arg arg2 __attribute__((unused))) {
+	cleanup_process();
+	scheduler();
+
+	return 0;
+}
+
 // syscall table
 typedef syscall_ret (*syscall_fn)(syscall_arg, syscall_arg, syscall_arg);
-static const syscall_fn syscall_table[] = {[SYS_WRITE] = syscall_write,
-										   [SYS_READ] = syscall_read,
-										   [SYS_TICK] = syscall_tick};
+static const syscall_fn syscall_table[] = {
+	[SYS_WRITE] = syscall_write,		[SYS_READ] = syscall_read,
+	[SYS_TICK] = syscall_tick,			[SYS_DELAY] = syscall_delay,
+	[SYS_YIELD] = syscall_yield,		[SYS_START_PROC] = syscall_start_proc,
+	[SYS_EXIT_PROC] = syscall_exit_proc};
 #define SYSCALL_TABLE_SIZE (sizeof(syscall_table) / sizeof(syscall_fn))
 
-uint32_t dispatch_syscall(exception_frame *frame, uint32_t syscall,
-						  syscall_ret exc_return) {
+void dispatch_syscall(exception_frame *frame, uint32_t syscall) {
 	if (syscall < 0 || syscall >= SYSCALL_TABLE_SIZE) {
 		kprintf("Invalid system call\n");
 		frame->r0 = (uint32_t)-1;
-		return exc_return;
+		return;
 	}
 
 	frame->r0 = syscall_table[syscall](frame->r0, frame->r1, frame->r2);
-
-	return exc_return;
 }

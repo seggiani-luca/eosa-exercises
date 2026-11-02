@@ -1,6 +1,7 @@
 #include "../../include/serial.h"
 #include "../../include/irq.h"
-#include "../../include/wfi.h"
+#include "../../include/process.h"
+#include <stdint.h>
 
 // serial buffer
 typedef struct {
@@ -36,6 +37,9 @@ typedef struct {
 
 	// receiver busy flag
 	int rx_busy;
+
+	// receiver waiting queue
+	process_queue rx_queue;
 } serial_block;
 
 // serial blocks
@@ -167,18 +171,21 @@ unsigned int uart_read(void *ctx, char *buf, unsigned int len) {
 	uint32_t saved = irq_save();
 
 	// start if idle
-	if (!bl->rx_busy && sbuf_empty(&bl->rx_buf)) {
+	if (!bl->rx_busy) {
 		// start reception
 		bl->uart->CTRL |= UART_CTRL_RXIRQEN;
 		bl->rx_busy = 1;
+	}
 
-		// wait for first byte
+	// if nothing yet, block
+	if (sbuf_empty(&bl->rx_buf)) {
+		current->state = PROC_BLOCKED;
+		process_queue_push(&bl->rx_queue, current);
+		current->block.rx_buf = buf;
+		scheduler();
+
 		irq_restore(saved);
-
-		while (sbuf_empty(&bl->rx_buf))
-			wfi();
-
-		saved = irq_save();
+		return 0;
 	}
 
 	// load from receiver buffer
@@ -207,11 +214,25 @@ void UART0TX_Handler(void) {
 
 // serial reception handler 0
 void UART0RX_Handler(void) {
-	if (!sbuf_full(&uart0.rx_buf)) {
-		// get more
-		sbuf_push(&uart0.rx_buf, (int)(CMSDK_UART0->DATA & 0xFF));
+	// get char
+	char c = (char)(CMSDK_UART0->DATA & 0xFF);		
+
+	if(uart0.rx_queue) {
+		// process blocked on first character, feed
+		process *proc = process_queue_pop(&uart0.rx_queue);
+		*proc->block.rx_buf = c;
+		((uint32_t*)(uintptr_t)proc->sp)[8] = 1;
+
+		// and now unblock
+		proc->state = PROC_READY;
+		process_queue_push(&scheduler_process_queue, proc);
 	} else {
-		// stop the serial interface
+		// process running, feed buffer 
+		sbuf_push(&uart0.rx_buf, c);
+	}
+
+	// if full, stop the serial interface
+	if (sbuf_full(&uart0.rx_buf)) {
 		CMSDK_UART0->CTRL &= ~UART_CTRL_RXIRQEN;
 		uart0.rx_busy = 0;
 	}
@@ -235,11 +256,25 @@ void UART1TX_Handler(void) {
 
 // serial reception handler 1
 void UART1RX_Handler(void) {
-	if (!sbuf_full(&uart1.rx_buf)) {
-		// get more
-		sbuf_push(&uart1.rx_buf, (int)(CMSDK_UART1->DATA & 0xFF));
+	// get char
+	char c = (char)(CMSDK_UART1->DATA & 0xFF);		
+
+	if(uart1.rx_queue) {
+		// process blocked on first character, feed
+		process *proc = process_queue_pop(&uart1.rx_queue);
+		*proc->block.rx_buf = c;
+		((uint32_t*)(uintptr_t)proc->sp)[8] = 1;
+
+		// and now unblock
+		proc->state = PROC_READY;
+		process_queue_push(&scheduler_process_queue, proc);
 	} else {
-		// stop the serial interface
+		// process running, feed buffer 
+		sbuf_push(&uart1.rx_buf, c);
+	}
+
+	// if full, stop the serial interface
+	if (sbuf_full(&uart1.rx_buf)) {
 		CMSDK_UART1->CTRL &= ~UART_CTRL_RXIRQEN;
 		uart1.rx_busy = 0;
 	}
@@ -263,11 +298,25 @@ void UART2TX_Handler(void) {
 
 // serial reception handler 2
 void UART2RX_Handler(void) {
-	if (!sbuf_full(&uart2.rx_buf)) {
-		// get more
-		sbuf_push(&uart2.rx_buf, (int)(CMSDK_UART2->DATA & 0xFF));
+	// get char
+	char c = (char)(CMSDK_UART2->DATA & 0xFF);		
+
+	if(uart2.rx_queue) {
+		// process blocked on first character, feed
+		process *proc = process_queue_pop(&uart2.rx_queue);
+		*proc->block.rx_buf = c;
+		((uint32_t*)(uintptr_t)proc->sp)[8] = 1;
+
+		// and now unblock
+		proc->state = PROC_READY;
+		process_queue_push(&scheduler_process_queue, proc);
 	} else {
-		// stop the serial interface
+		// process running, feed buffer 
+		sbuf_push(&uart2.rx_buf, c);
+	}
+
+	// if full, stop the serial interface
+	if (sbuf_full(&uart2.rx_buf)) {
 		CMSDK_UART2->CTRL &= ~UART_CTRL_RXIRQEN;
 		uart2.rx_busy = 0;
 	}

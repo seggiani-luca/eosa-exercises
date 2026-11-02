@@ -27,6 +27,10 @@ timer_driver timer0_driver = {
 timer_driver timer1_driver = {
 	.init = timer_init, .tick = timer_tick, .ctx = &timer1};
 
+// queues
+timer_queue timer0_queue;
+timer_queue timer1_queue;
+
 void timer_init(void *ctx, int period_ms) {
 	timer_block *bl = ctx;
 
@@ -59,12 +63,14 @@ void TIMER0_Handler(void) {
 	CMSDK_TIMER0->INTSTATUS = TIMER_INT_PENDING;
 
 	timer0.ticks++;
+	timer_queue_advance(&timer0_queue, timer0.period);
 }
 
 void TIMER1_Handler(void) {
 	CMSDK_TIMER1->INTSTATUS = TIMER_INT_PENDING;
 
 	timer1.ticks++;
+	timer_queue_advance(&timer1_queue, timer1.period);
 
 	// feed watchdog
 	watchdog_feed();
