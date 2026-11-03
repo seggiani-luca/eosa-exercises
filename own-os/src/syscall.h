@@ -6,7 +6,8 @@
 #define SYS_READ 2	// request read from a character device
 #define SYS_TICK 3	// request counted ms from a timer
 #define SYS_DELAY 4 // block, sleeping on a timer for given ms
-#define SYS_YIELD 5 // yield control to scheduler
+#define SYS_UNTIL 5 // block, sleeping on a timer until given ms
+#define SYS_YIELD 6 // yield control to scheduler
 
 #define SYS_START_PROC 128 // starts a process
 #define SYS_EXIT_PROC 129  // terminates a process

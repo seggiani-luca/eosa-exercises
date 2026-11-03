@@ -13,6 +13,13 @@ typedef enum {
 	PROC_TERMINATED
 } process_state;
 
+// process queue priorities
+typedef enum {
+	PRIO_HIGH,
+	PRIO_LOW,
+	PRIO_IDLE
+} process_priority;
+
 // process descriptor
 typedef struct process {
 	// stack pointer
@@ -23,6 +30,9 @@ typedef struct process {
 
 	// process state
 	process_state state;
+
+	// process priority
+	process_priority prio;
 
 	// processor block conditino
 	union {
@@ -81,7 +91,9 @@ extern void context_in();
 typedef process *process_queue;
 
 // scheduler process queue
-extern process_queue scheduler_process_queue;
+extern process_queue high_prio_process_queue;
+extern process_queue low_prio_process_queue;
+extern process_queue idle_process_queue;
 
 // current process
 extern process *current;
@@ -91,5 +103,11 @@ void process_queue_push(process_queue *queue, process *proc);
 
 // pop from process queue
 process *process_queue_pop(process_queue *queue);
+
+// selects process queue from process priority
+process_queue* queue_from_prio(process_priority prio);
+
+// round-robin scheduling quantum
+#define QUANTUM 10
 
 #endif

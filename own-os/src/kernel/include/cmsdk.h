@@ -9,6 +9,7 @@
 #define NVIC_SERIAL_PRIO 0xC0
 #define NVIC_TIMER_PRIO 0xC0
 #define SCB_SYSTICK_PRIO 0xE0
+#define SCB_PENDSV_PRIO 0xF0
 
 /* SysTick */
 
@@ -77,6 +78,8 @@ typedef struct {
 #define SCB_CFSR_DACCVIOL (1UL << 1)  // data access violation
 #define SCB_CFSR_MUNSTKERR (1UL << 3) // unstacking fault
 #define SCB_CFSR_MSTKERR (1UL << 4)	  // exception stacking fault
+
+#define SCB_ICSR_PENDSVSET (1UL << 28) // write 1: make PendSV pending
 
 /* UART */
 

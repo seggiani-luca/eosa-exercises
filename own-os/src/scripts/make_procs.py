@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path
+import re
 
 # setup arguments
 parser = argparse.ArgumentParser(description="Generate process linker script and header")
@@ -18,12 +19,17 @@ processes = []
 for proc_file in proc_files:
     name = proc_file.stem
 
+    source = proc_file.read_text()
+    match = re.search(r'PROCESS_PRIORITY\((\w+)\)', source)
+    prio = match.group(1) if match else "PRIO_LOW"
+
     processes.append({
         # source and name
         "src": proc_file.name,
         "obj": f"{name}.o",
         "name": name,
         "index": id,
+        "prio": prio,
 
         # entry point
         "entry": f"{name}_main",
@@ -96,6 +102,7 @@ static void init_process_table(process* process_table) {{
     // {p["name"]}
     process_table[{p["index"]}].name = "{p["name"]}";
     process_table[{p["index"]}].entry = {p["entry"]};
+    process_table[{p["index"]}].prio = {p["prio"]};
 
     process_table[{p["index"]}].spart = (uintptr_t)&{p["spart"]};
     process_table[{p["index"]}].epart = (uintptr_t)&{p["epart"]};

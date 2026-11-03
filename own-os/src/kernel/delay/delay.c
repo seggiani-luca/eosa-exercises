@@ -28,7 +28,7 @@ void timer_queue_advance(timer_queue *queue, unsigned int ms) {
 
 		// ready it
 		ready->state = PROC_READY;
-		process_queue_push(&scheduler_process_queue, ready);
+		process_queue_push(queue_from_prio(ready->prio), ready);
 	}
 
 	if (*queue)

@@ -19,11 +19,17 @@ extern int tick(int dev);
 // block, sleeping on a timer for given ms
 extern void delay(int dev, unsigned int ms);
 
+// block, sleeping on a timer until given ms
+extern void until(int dev, unsigned int ms);
+
 // yield control to scheduler
 extern void yield();
 
 // terminate this process
 extern void terminate();
+
+// not a syscall, process priority specifier
+#define PROCESS_PRIORITY(p)
 
 /* format */
 

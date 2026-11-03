@@ -1,4 +1,5 @@
 #include "../include/lib.h"
+PROCESS_PRIORITY(PRIO_LOW)
 
 #define BUF_SIZ 128
 

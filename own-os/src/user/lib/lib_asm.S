@@ -28,6 +28,12 @@ delay:
     svc #SYS_DELAY
     bx lr
 
+.global until
+.thumb_func
+until:
+    svc #SYS_UNTIL
+    bx lr
+
 .global yield
 .thumb_func
 yield:

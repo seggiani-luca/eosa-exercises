@@ -7,6 +7,17 @@
 #include <stdint.h>
 #include <strings.h>
 
+// diagnostic helper for process data
+void process_print(process* proc) {
+	kprintf("Process %s\n", proc->name);
+	kprintf("State: %d; Priority: %d\n", proc->state, proc->prio);
+	kprintf("spart: %p, epart: %p, estack: %p\n"
+			"sdata: %p, edata: %p\n"
+			"sbss:  %p, ebss:  %p\n\n",
+			proc->name, proc->spart, proc->epart, proc->estack,
+			proc->sdata, proc->edata, proc->sbss, proc->ebss);
+}
+
 /* process queue */
 
 // push to process queue
@@ -30,7 +41,19 @@ process *process_queue_pop(process_queue *queue) {
 	return tmp;
 }
 
-process_queue scheduler_process_queue = 0;
+process_queue high_prio_process_queue = 0;
+process_queue low_prio_process_queue = 0;
+process_queue idle_process_queue = 0;
+
+process_queue* queue_from_prio(process_priority prio) {
+	switch(prio) {
+		case PRIO_HIGH: return &high_prio_process_queue;
+		case PRIO_LOW: return &low_prio_process_queue;
+		case PRIO_IDLE: return &idle_process_queue;
+	}
+
+	return 0;
+}
 
 process *current = 0;
 
@@ -79,12 +102,8 @@ void init_partition(process *proc) {
 }
 
 void init_process(process *proc) {
-	kprintf("Initializing process %s\n"
-			"spart: %p, epart: %p, estack: %p\n"
-			"sdata: %p, edata: %p\n"
-			"sbss:  %p, ebss:  %p\n\n",
-			proc->name, proc->spart, proc->epart, proc->estack, proc->sdata,
-			proc->edata, proc->sbss, proc->ebss);
+	kprintf("Initializing: ");
+	process_print(proc);
 
 	// init data regions
 	Data_Init(proc->sdata, proc->edata, proc->sidata);
@@ -97,6 +116,7 @@ void init_process(process *proc) {
 	init_stack(proc);
 }
 
+process *scheduler_next(void);
 void init_processes() {
 	// initialize process table
 	init_process_table(process_table);
@@ -106,11 +126,18 @@ void init_processes() {
 		process *proc = &process_table[i];
 		init_process(proc);
 
-		process_queue_push(&scheduler_process_queue, proc);
+		process_queue* queue = queue_from_prio(proc->prio);
+		if(!queue) continue;
+		process_queue_push(queue, proc);
 	}
 
 	// prepare first process to execute
-	current = process_queue_pop(&scheduler_process_queue);
+    current = scheduler_next();
+	if(!current) {
+		kprintf("No processes to schedule at startup!\n");
+		kpanic();
+	}
+
 	init_partition(current);
 	current->state = PROC_RUNNING;
 }
@@ -118,17 +145,27 @@ void init_processes() {
 /* exit */
 
 void cleanup_process() {
-	kprintf("\nTerminating process %s\n"
-			"spart: %p, epart: %p, estack: %p\n"
-			"sdata: %p, edata: %p\n"
-			"sbss:  %p, ebss:  %p\n\n",
-			current->name, current->spart, current->epart, current->estack,
-			current->sdata, current->edata, current->sbss, current->ebss);
+	kprintf("\nTerminating: ");
+	process_print(current);
 
 	current->state = PROC_TERMINATED;
 }
 
 /* scheduler */
+
+// selects next process to schedule
+process *scheduler_next(void) {
+    if (high_prio_process_queue)
+        return process_queue_pop(&high_prio_process_queue);
+
+    if (low_prio_process_queue)
+        return process_queue_pop(&low_prio_process_queue);
+
+    if (idle_process_queue)
+        return process_queue_pop(&idle_process_queue);
+
+    return 0;
+}
 
 void scheduler() {
 	uint32_t saved = irq_save();
@@ -136,11 +173,15 @@ void scheduler() {
 	// push current process to queue if running
 	if (current->state == PROC_RUNNING) {
 		current->state = PROC_READY;
-		process_queue_push(&scheduler_process_queue, current);
+		process_queue_push(queue_from_prio(current->prio), current);
 	}
 
 	// schedule next process
-	current = process_queue_pop(&scheduler_process_queue);
+    current = scheduler_next();
+	if(!current) {
+		kprintf("No processes to schedule at scheduler!\n");
+		kpanic();
+	}
 
 	// prepare process to execute
 	init_partition(current);

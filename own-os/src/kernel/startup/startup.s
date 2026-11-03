@@ -14,6 +14,7 @@
 .extern Usage_Handler
 .extern Default_Handler
 .extern SysTick_Handler
+.extern PendSV_Handler
 
 .extern UART0RX_Handler
 .extern UART0TX_Handler
@@ -42,7 +43,7 @@
     .word SVC_Handler       // supervisor call
     .word Default_Handler   // debug monitor
     .word 0                 // reserved
-    .word Default_Handler   // pending supervisor
+    .word PendSV_Handler    // pending supervisor
     .word SysTick_Handler   // SysTick
 
     // external

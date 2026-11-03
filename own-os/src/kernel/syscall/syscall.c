@@ -109,6 +109,25 @@ syscall_ret syscall_delay(syscall_arg dev, syscall_arg ms,
 	return 0;
 }
 
+syscall_ret syscall_until(syscall_arg dev, syscall_arg ms,
+						  syscall_arg arg2 __attribute__((unused))) {
+	timer_queue *queue = get_timer_queue(dev);
+	if (!queue)
+		return -1;
+	timer_driver *driver = get_timer_dev(dev);
+	if (!driver)
+		return -1;
+
+	// just sleep, only if needed
+	unsigned int delta = ms - driver->tick(driver->ctx);
+	if(delta > 0) {
+		timer_queue_push(queue, current, ms);
+		scheduler();
+	}
+
+	return 0;
+}
+
 syscall_ret syscall_yield(syscall_arg arg0 __attribute__((unused)),
 						  syscall_arg arg1 __attribute__((unused)),
 						  syscall_arg arg2 __attribute__((unused))) {
@@ -139,6 +158,7 @@ typedef syscall_ret (*syscall_fn)(syscall_arg, syscall_arg, syscall_arg);
 static const syscall_fn syscall_table[] = {
 	[SYS_WRITE] = syscall_write,		[SYS_READ] = syscall_read,
 	[SYS_TICK] = syscall_tick,			[SYS_DELAY] = syscall_delay,
+	[SYS_UNTIL] = syscall_until,
 	[SYS_YIELD] = syscall_yield,		[SYS_START_PROC] = syscall_start_proc,
 	[SYS_EXIT_PROC] = syscall_exit_proc};
 #define SYSCALL_TABLE_SIZE (sizeof(syscall_table) / sizeof(syscall_fn))

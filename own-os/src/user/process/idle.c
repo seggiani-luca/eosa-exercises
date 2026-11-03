@@ -1,8 +1,8 @@
-#include "../../kernel/include/wfi.h"
+#include "../include/lib.h"
+PROCESS_PRIORITY(PRIO_IDLE)
 
 int idle_main(void) {
-	for (;;)
-		wfi();
+	for(;;) yield();
 
 	// never reached
 	return 0;

@@ -3,7 +3,10 @@
 
 void handler_init() {
 	// (unrelated) allow devices over SVC
-	SCB->SHPR[7] = SCB_SYSTICK_PRIO;
+	SCB->SHPR[SCB_SHPR_SVCALL] = SCB_SYSTICK_PRIO;
+
+	// PendSV has lowest priority	
+	SCB->SHPR[SCB_SHPR_PENDSV] = SCB_PENDSV_PRIO;
 
 	// enable all fault types
 	SCB->SHCSR |=
@@ -19,8 +22,7 @@ void NMI_Handler() {
 		kprintf("reset will follow if not handled \n");
 	}
 
-	while (1)
-		;
+	kpanic();
 }
 
 void HardFault_Handler() {
@@ -34,8 +36,7 @@ void HardFault_Handler() {
 	if (SCB->HFSR & SCB_HFSR_FORCED)
 		kprintf("forced configurable fault\n");
 
-	while (1)
-		;
+	kpanic();
 }
 
 void Memory_Handler() {
@@ -55,8 +56,7 @@ void Memory_Handler() {
 	if (SCB->CFSR & SCB_CFSR_MSTKERR)
 		kprintf("fault while stacking (exception)\n");
 
-	while (1)
-		;
+	kpanic();
 }
 
 void Bus_Handler() {
@@ -71,8 +71,7 @@ void Bus_Handler() {
 	if (cfsr & SCB_CFSR_PRECISERR)
 		kprintf("precise data access error\n");
 
-	while (1)
-		;
+	kpanic();
 }
 
 void Usage_Handler() {
@@ -90,8 +89,7 @@ void Usage_Handler() {
 	if (cfsr & SCB_CFSR_DIVBYZERO)
 		kprintf("division by zero\n");
 
-	while (1)
-		;
+	kpanic();
 }
 
 void Default_Handler() {

@@ -1,16 +1,12 @@
 .syntax unified
 
-.extern ticks
+.extern context_out
 .extern scheduler
 .extern context_in
 
-.extern SysTick_Handler_C // TODO
-
-.global SysTick_Handler
+.global PendSV_Handler 
 .thumb_func
-SysTick_Handler:
-	bl SysTick_Handler_C
-
+PendSV_Handler:
 	# context switch
 	bl context_out
     bl scheduler

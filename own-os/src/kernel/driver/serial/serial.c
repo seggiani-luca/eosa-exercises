@@ -225,7 +225,7 @@ void UART0RX_Handler(void) {
 
 		// and now unblock
 		proc->state = PROC_READY;
-		process_queue_push(&scheduler_process_queue, proc);
+		process_queue_push(queue_from_prio(proc->prio), proc);
 	} else {
 		// process running, feed buffer 
 		sbuf_push(&uart0.rx_buf, c);
@@ -267,7 +267,7 @@ void UART1RX_Handler(void) {
 
 		// and now unblock
 		proc->state = PROC_READY;
-		process_queue_push(&scheduler_process_queue, proc);
+		process_queue_push(queue_from_prio(proc->prio), proc);
 	} else {
 		// process running, feed buffer 
 		sbuf_push(&uart1.rx_buf, c);
@@ -309,7 +309,7 @@ void UART2RX_Handler(void) {
 
 		// and now unblock
 		proc->state = PROC_READY;
-		process_queue_push(&scheduler_process_queue, proc);
+		process_queue_push(queue_from_prio(proc->prio), proc);
 	} else {
 		// process running, feed buffer 
 		sbuf_push(&uart2.rx_buf, c);

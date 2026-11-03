@@ -60,6 +60,7 @@ static void init_process_table(process* process_table) {
     // idle
     process_table[0].name = "idle";
     process_table[0].entry = idle_main;
+    process_table[0].prio = PRIO_IDLE;
 
     process_table[0].spart = (uintptr_t)&__idle_spart;
     process_table[0].epart = (uintptr_t)&__idle_epart;
@@ -76,6 +77,7 @@ static void init_process_table(process* process_table) {
     // process_a
     process_table[1].name = "process_a";
     process_table[1].entry = process_a_main;
+    process_table[1].prio = PRIO_LOW;
 
     process_table[1].spart = (uintptr_t)&__process_a_spart;
     process_table[1].epart = (uintptr_t)&__process_a_epart;
@@ -92,6 +94,7 @@ static void init_process_table(process* process_table) {
     // process_b
     process_table[2].name = "process_b";
     process_table[2].entry = process_b_main;
+    process_table[2].prio = PRIO_HIGH;
 
     process_table[2].spart = (uintptr_t)&__process_b_spart;
     process_table[2].epart = (uintptr_t)&__process_b_epart;
