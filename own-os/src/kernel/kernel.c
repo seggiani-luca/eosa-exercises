@@ -1,3 +1,4 @@
+#include "include/atomic.h"
 #include "include/cmsdk.h"
 #include "include/handler.h"
 #include "include/log.h"
@@ -40,6 +41,10 @@ int kernel_main(void) {
 				   1,			 // executable
 				   0			 // no srd
 	);
+
+	// initialize heaps
+	ksem_init_heap();	// semaphore heap
+	kmutex_init_heap(); // mutex heap
 
 	// initialize processes
 	init_processes();

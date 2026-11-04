@@ -40,6 +40,54 @@ yield:
     svc #SYS_YIELD
     bx lr
 
+.global sem_new
+.thumb_func
+sem_new:
+    svc #SYS_SEM_NEW
+    bx lr
+
+.global sem_lock
+.thumb_func
+sem_lock:
+    svc #SYS_SEM_LOCK
+    bx lr
+
+.global sem_unlock
+.thumb_func
+sem_unlock:
+    svc #SYS_SEM_UNLOCK
+    bx lr
+
+.global sem_free
+.thumb_func
+sem_free:
+    svc #SYS_SEM_FREE
+    bx lr
+
+.global mutex_new
+.thumb_func
+mutex_new:
+    svc #SYS_MUTEX_NEW
+    bx lr
+
+.global mutex_lock
+.thumb_func
+mutex_lock:
+    svc #SYS_MUTEX_LOCK
+    bx lr
+
+.global mutex_unlock
+.thumb_func
+mutex_unlock:
+    svc #SYS_MUTEX_UNLOCK
+    bx lr
+
+.global mutex_free
+.thumb_func
+mutex_free:
+    svc #SYS_MUTEX_FREE
+    bx lr
+
 .global terminate
 .thumb_func
 terminate:

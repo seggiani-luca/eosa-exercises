@@ -20,6 +20,7 @@ BIN         := $(OUT)/kernel.axf
 # tools
 CC     := arm-none-eabi-gcc
 CFLAGS := -mthumb -mcpu=cortex-m3 -nostartfiles -ffreestanding -fno-builtin -std=gnu17 -g
+CFLAGS += -DUSE_MUTEX
 
 LFLAGS := -T $(PROC_LSCRIPT)
 LFLAGS += -Xlinker -Map=$(OUT)/output.map -nostdlib -lgcc

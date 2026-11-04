@@ -217,17 +217,17 @@ void UART0RX_Handler(void) {
 	// get char
 	char c = (char)(CMSDK_UART0->DATA & 0xFF);
 
-	if(uart0.rx_queue) {
+	if (uart0.rx_queue) {
 		// process blocked on first character, feed
 		process *proc = process_queue_pop(&uart0.rx_queue);
 		*proc->block.rx_buf = c;
-		((uint32_t*)(uintptr_t)proc->sp)[8] = 1;
+		((uint32_t *)(uintptr_t)proc->sp)[8] = 1;
 
 		// and now unblock
 		proc->state = PROC_READY;
 		process_queue_push(queue_from_prio(proc->prio), proc);
 	} else {
-		// process running, feed buffer 
+		// process running, feed buffer
 		sbuf_push(&uart0.rx_buf, c);
 	}
 
@@ -257,19 +257,19 @@ void UART1TX_Handler(void) {
 // serial reception handler 1
 void UART1RX_Handler(void) {
 	// get char
-	char c = (char)(CMSDK_UART1->DATA & 0xFF);		
+	char c = (char)(CMSDK_UART1->DATA & 0xFF);
 
-	if(uart1.rx_queue) {
+	if (uart1.rx_queue) {
 		// process blocked on first character, feed
 		process *proc = process_queue_pop(&uart1.rx_queue);
 		*proc->block.rx_buf = c;
-		((uint32_t*)(uintptr_t)proc->sp)[8] = 1;
+		((uint32_t *)(uintptr_t)proc->sp)[8] = 1;
 
 		// and now unblock
 		proc->state = PROC_READY;
 		process_queue_push(queue_from_prio(proc->prio), proc);
 	} else {
-		// process running, feed buffer 
+		// process running, feed buffer
 		sbuf_push(&uart1.rx_buf, c);
 	}
 
@@ -299,19 +299,19 @@ void UART2TX_Handler(void) {
 // serial reception handler 2
 void UART2RX_Handler(void) {
 	// get char
-	char c = (char)(CMSDK_UART2->DATA & 0xFF);		
+	char c = (char)(CMSDK_UART2->DATA & 0xFF);
 
-	if(uart2.rx_queue) {
+	if (uart2.rx_queue) {
 		// process blocked on first character, feed
 		process *proc = process_queue_pop(&uart2.rx_queue);
 		*proc->block.rx_buf = c;
-		((uint32_t*)(uintptr_t)proc->sp)[8] = 1;
+		((uint32_t *)(uintptr_t)proc->sp)[8] = 1;
 
 		// and now unblock
 		proc->state = PROC_READY;
 		process_queue_push(queue_from_prio(proc->prio), proc);
 	} else {
-		// process running, feed buffer 
+		// process running, feed buffer
 		sbuf_push(&uart2.rx_buf, c);
 	}
 

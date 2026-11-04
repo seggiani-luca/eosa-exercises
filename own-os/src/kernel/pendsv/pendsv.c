@@ -3,5 +3,5 @@
 
 void pendsv_request() {
 	// make PendSV pending
-    SCB->ICSR = SCB_ICSR_PENDSVSET;
+	SCB->ICSR = SCB_ICSR_PENDSVSET;
 }

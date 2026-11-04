@@ -5,7 +5,7 @@ void handler_init() {
 	// (unrelated) allow devices over SVC
 	SCB->SHPR[SCB_SHPR_SVCALL] = SCB_SYSTICK_PRIO;
 
-	// PendSV has lowest priority	
+	// PendSV has lowest priority
 	SCB->SHPR[SCB_SHPR_PENDSV] = SCB_PENDSV_PRIO;
 
 	// enable all fault types

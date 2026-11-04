@@ -4,7 +4,7 @@
 // kernel debug out
 void kprintf(const char *fmt, ...);
 
-// kernel panic 
+// kernel panic
 void kpanic();
 
 #endif

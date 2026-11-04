@@ -1,7 +1,7 @@
 #include "../../include/systick.h"
 #include "../../include/cmsdk.h"
-#include "../../include/process.h"
 #include "../../include/pendsv.h"
+#include "../../include/process.h"
 
 timer_driver systick_driver = {
 	.init = systick_init,
@@ -37,7 +37,7 @@ void SysTick_Handler(void) {
 
 	// advance round-robin quantum
 	quantum += period;
-	if(quantum >= QUANTUM) {
+	if (quantum >= QUANTUM) {
 		quantum = 0;
 		pendsv_request();
 	}

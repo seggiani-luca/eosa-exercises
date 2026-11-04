@@ -19,5 +19,6 @@ void kprintf(const char *fmt, ...) {
 void kpanic() {
 	kprintf("Kernel panicked\n");
 	kprintf("Waiting for watchdog...");
-	for(;;);
+	for (;;)
+		;
 }

@@ -1,4 +1,5 @@
 #include "../../syscall.h"
+#include "../include/atomic.h"
 #include "../include/control.h"
 #include "../include/delay.h"
 #include "../include/log.h"
@@ -120,7 +121,7 @@ syscall_ret syscall_until(syscall_arg dev, syscall_arg ms,
 
 	// just sleep, only if needed
 	unsigned int delta = ms - driver->tick(driver->ctx);
-	if(delta > 0) {
+	if (delta > 0) {
 		timer_queue_push(queue, current, ms);
 		scheduler();
 	}
@@ -153,13 +154,114 @@ syscall_ret syscall_exit_proc(syscall_arg arg0 __attribute__((unused)),
 	return 0;
 }
 
+syscall_ret syscall_sem_new(syscall_arg initial,
+							syscall_arg arg1 __attribute__((unused)),
+							syscall_arg arg2 __attribute__((unused))) {
+	semaphore *sem = ksem_new(initial);
+	return (uintptr_t)sem;
+}
+
+syscall_ret syscall_sem_lock(syscall_arg sem,
+							 syscall_arg arg1 __attribute__((unused)),
+							 syscall_arg arg2 __attribute__((unused))) {
+	if (!is_ksem_valid((semaphore *)sem)) {
+		kprintf("Invalid semaphore\n");
+		return 0;
+	}
+
+	ksem_lock((semaphore *)sem, current);
+	if (current->state == PROC_BLOCKED)
+		scheduler();
+	return 0;
+}
+
+syscall_ret syscall_sem_unlock(syscall_arg sem,
+							   syscall_arg arg1 __attribute__((unused)),
+							   syscall_arg arg2 __attribute__((unused))) {
+	if (!is_ksem_valid((semaphore *)sem)) {
+		kprintf("Invalid semaphore\n");
+		return 0;
+	}
+
+	ksem_unlock((semaphore *)sem);
+	return 0;
+}
+
+syscall_ret syscall_sem_free(syscall_arg sem,
+							 syscall_arg arg1 __attribute__((unused)),
+							 syscall_arg arg2 __attribute__((unused))) {
+	if (!is_ksem_valid((semaphore *)sem)) {
+		kprintf("Invalid semaphore\n");
+		return 0;
+	}
+
+	ksem_free((semaphore *)sem);
+	return 0;
+}
+
+syscall_ret syscall_mutex_new(syscall_arg arg0 __attribute__((unused)),
+							  syscall_arg arg1 __attribute__((unused)),
+							  syscall_arg arg2 __attribute__((unused))) {
+	mutex *mutex = kmutex_new();
+	return (uintptr_t)mutex;
+}
+
+syscall_ret syscall_mutex_lock(syscall_arg mut,
+							   syscall_arg arg1 __attribute__((unused)),
+							   syscall_arg arg2 __attribute__((unused))) {
+	if (!is_kmutex_valid((mutex *)mut)) {
+		kprintf("Invalid mutex\n");
+		return 0;
+	}
+
+	kmutex_lock((mutex *)mut, current);
+	if (current->state == PROC_BLOCKED)
+		scheduler();
+	return 0;
+}
+
+syscall_ret syscall_mutex_unlock(syscall_arg mut,
+								 syscall_arg arg1 __attribute__((unused)),
+								 syscall_arg arg2 __attribute__((unused))) {
+	if (!is_kmutex_valid((mutex *)mut)) {
+		kprintf("Invalid mutex\n");
+		return 0;
+	}
+
+	kmutex_unlock((mutex *)mut, current);
+	return 0;
+}
+
+syscall_ret syscall_mutex_free(syscall_arg mut,
+							   syscall_arg arg1 __attribute__((unused)),
+							   syscall_arg arg2 __attribute__((unused))) {
+	if (!is_kmutex_valid((mutex *)mut)) {
+		kprintf("Invalid mutex\n");
+		return 0;
+	}
+
+	kmutex_free((mutex *)mut);
+	return 0;
+}
+
 // syscall table
 typedef syscall_ret (*syscall_fn)(syscall_arg, syscall_arg, syscall_arg);
 static const syscall_fn syscall_table[] = {
-	[SYS_WRITE] = syscall_write,		[SYS_READ] = syscall_read,
-	[SYS_TICK] = syscall_tick,			[SYS_DELAY] = syscall_delay,
+	[SYS_WRITE] = syscall_write,
+	[SYS_READ] = syscall_read,
+	[SYS_TICK] = syscall_tick,
+	[SYS_DELAY] = syscall_delay,
 	[SYS_UNTIL] = syscall_until,
-	[SYS_YIELD] = syscall_yield,		[SYS_START_PROC] = syscall_start_proc,
+	[SYS_YIELD] = syscall_yield,
+	[SYS_SEM_NEW] = syscall_sem_new,
+	[SYS_SEM_LOCK] = syscall_sem_lock,
+	[SYS_SEM_UNLOCK] = syscall_sem_unlock,
+	[SYS_SEM_FREE] = syscall_sem_free,
+	[SYS_MUTEX_NEW] = syscall_mutex_new,
+	[SYS_MUTEX_LOCK] = syscall_mutex_lock,
+	[SYS_MUTEX_UNLOCK] = syscall_mutex_unlock,
+	[SYS_MUTEX_FREE] = syscall_mutex_free,
+	[SYS_START_PROC] = syscall_start_proc,
 	[SYS_EXIT_PROC] = syscall_exit_proc};
 #define SYSCALL_TABLE_SIZE (sizeof(syscall_table) / sizeof(syscall_fn))
 

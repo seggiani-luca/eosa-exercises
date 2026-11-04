@@ -14,11 +14,7 @@ typedef enum {
 } process_state;
 
 // process queue priorities
-typedef enum {
-	PRIO_HIGH,
-	PRIO_LOW,
-	PRIO_IDLE
-} process_priority;
+typedef enum { PRIO_HIGH, PRIO_LOW, PRIO_IDLE } process_priority;
 
 // process descriptor
 typedef struct process {
@@ -37,7 +33,7 @@ typedef struct process {
 	// processor block conditino
 	union {
 		unsigned int delta; // delay time delta
-		char* rx_buf;       // buffer for serial receiver (first char)
+		char *rx_buf;		// buffer for serial receiver (first char)
 	} block;
 
 	// entry point
@@ -105,7 +101,7 @@ void process_queue_push(process_queue *queue, process *proc);
 process *process_queue_pop(process_queue *queue);
 
 // selects process queue from process priority
-process_queue* queue_from_prio(process_priority prio);
+process_queue *queue_from_prio(process_priority prio);
 
 // round-robin scheduling quantum
 #define QUANTUM 10

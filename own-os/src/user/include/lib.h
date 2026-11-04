@@ -5,6 +5,23 @@
 #include <stdarg.h>
 #include <stdint.h>
 
+/* synchronization */
+
+// definition for spinlock, just an integer
+typedef uint32_t spinlock;
+
+// locks a spinlock
+void spin_lock(spinlock *lock);
+
+// unlocks a spinlock
+void spin_unlock(spinlock *lock);
+
+// definition for opaque semaphore
+typedef uint32_t semaphore_t;
+
+// definition for opaque mutex
+typedef uint32_t mutex_t;
+
 /* syscalls */
 
 // request write to a character device
@@ -27,6 +44,30 @@ extern void yield();
 
 // terminate this process
 extern void terminate();
+
+// reserves a semaphore
+extern semaphore_t sem_new(int initial);
+
+// locks a semaphore
+extern void sem_lock(semaphore_t sem);
+
+// unlocks a semaphore
+extern void sem_unlock(semaphore_t sem);
+
+// frees a semaphore
+extern void sem_free(semaphore_t sem);
+
+// reserves a mutex
+extern mutex_t mutex_new();
+
+// locks a mutex
+extern void mutex_lock(mutex_t mut);
+
+// unlocks a mutex
+extern void mutex_unlock(mutex_t mut);
+
+// frees a mutex
+extern void mutex_free(mutex_t mut);
 
 // not a syscall, process priority specifier
 #define PROCESS_PRIORITY(p)

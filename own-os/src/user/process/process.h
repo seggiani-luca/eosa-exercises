@@ -77,7 +77,7 @@ static void init_process_table(process* process_table) {
     // process_a
     process_table[1].name = "process_a";
     process_table[1].entry = process_a_main;
-    process_table[1].prio = PRIO_LOW;
+    process_table[1].prio = PRIO_HIGH;
 
     process_table[1].spart = (uintptr_t)&__process_a_spart;
     process_table[1].epart = (uintptr_t)&__process_a_epart;

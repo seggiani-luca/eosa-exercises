@@ -9,6 +9,16 @@
 #define SYS_UNTIL 5 // block, sleeping on a timer until given ms
 #define SYS_YIELD 6 // yield control to scheduler
 
+#define SYS_SEM_NEW 64	  // reserves a semaphore
+#define SYS_SEM_LOCK 65	  // locks a semaphore
+#define SYS_SEM_UNLOCK 66 // unlocks a semaphore
+#define SYS_SEM_FREE 67	  // frees a semaphore
+
+#define SYS_MUTEX_NEW 68	// reserves a mutex
+#define SYS_MUTEX_LOCK 69	// locks a mutex
+#define SYS_MUTEX_UNLOCK 70 // unlocks a mutex
+#define SYS_MUTEX_FREE 71	// frees a mutex
+
 #define SYS_START_PROC 128 // starts a process
 #define SYS_EXIT_PROC 129  // terminates a process
 
