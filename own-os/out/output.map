@@ -21,9 +21,9 @@ LOAD out/src/kernel/pendsv/pendsv_asm.o
 LOAD out/src/kernel/control/control_asm.o
 LOAD out/src/kernel/startup/startup.o
 LOAD out/src/kernel/driver/semihost/semihost_asm.o
-LOAD /tmp/cc7UhLPe.o
-LOAD /tmp/ccPLNjkj.o
-LOAD /tmp/cctYCAdG.o
+LOAD /tmp/ccokcmlJ.o
+LOAD /tmp/ccjsQm0X.o
+LOAD /tmp/ccveIKIp.o
 LOAD out/src/user/process/process_a.o
 LOAD out/src/user/process/process_b.o
 LOAD out/src/user/process/idle.o
@@ -58,7 +58,7 @@ LOAD out/src/kernel/driver/timer/timer.o
  .isr_vector    0x00000000       0xc0 out/src/kernel/startup/startup.o
                 0x000000c0                        . = ALIGN (0x4)
 
-.text           0x000000c0     0x2d6c
+.text           0x000000c0     0x2d84
                 0x000000c0                        . = ALIGN (0x4)
  *(.text*)
  .text          0x000000c0        0xe out/src/kernel/irq/irq_asm.o
@@ -82,7 +82,7 @@ LOAD out/src/kernel/driver/timer/timer.o
                 0x00000144                Bss_Init
  .text          0x00000168        0x4 out/src/kernel/driver/semihost/semihost_asm.o
                 0x00000168                shst_call
- .text          0x0000016c       0x3c /tmp/cc7UhLPe.o
+ .text          0x0000016c       0x3c /tmp/ccokcmlJ.o
                 0x0000016c                fwrite
                 0x00000170                fread
                 0x00000174                tick
@@ -98,12 +98,12 @@ LOAD out/src/kernel/driver/timer/timer.o
                 0x0000019c                mutex_unlock
                 0x000001a0                mutex_free
                 0x000001a4                terminate
- .text          0x000001a8       0x34 /tmp/ccPLNjkj.o
+ .text          0x000001a8       0x34 /tmp/ccjsQm0X.o
                 0x000001a8                context_out
                 0x000001ba                context_in
                 0x000001ce                start_process
                 0x000001d2                exit_process
- .text          0x000001dc       0x20 /tmp/cctYCAdG.o
+ .text          0x000001dc       0x20 /tmp/ccveIKIp.o
                 0x000001dc                SVC_Handler
  .text          0x000001fc       0x28 out/src/user/process/process_a.o
                 0x000001fc                process_a_main
@@ -216,75 +216,76 @@ LOAD out/src/kernel/driver/timer/timer.o
                 0x00001e28                mem_region_reset
  .text          0x00001e54       0x18 out/src/kernel/pendsv/pendsv.o
                 0x00001e54                pendsv_request
- .text          0x00001e6c       0xe8 out/src/kernel/delay/delay.o
+ .text          0x00001e6c       0xfe out/src/kernel/delay/delay.o
                 0x00001e6c                timer_queue_push
-                0x00001ede                timer_queue_advance
- .text          0x00001f54        0x0 out/src/kernel/driver/led/led.o
- .text          0x00001f54      0x5f0 out/src/kernel/driver/serial/serial.o
-                0x00001f54                sbuf_empty
-                0x00001f78                sbuf_full
-                0x00001fa2                sbuf_pop
-                0x00001fce                sbuf_push
-                0x00001ffc                uart_init
-                0x000020a4                uart_putc
-                0x000020d6                uart_getc
-                0x00002104                uart_write
-                0x000021c2                uart_read
-                0x00002290                UART0TX_Handler
-                0x000022e0                UART0RX_Handler
-                0x0000237c                UART1TX_Handler
-                0x000023c8                UART1RX_Handler
-                0x00002460                UART2TX_Handler
-                0x000024ac                UART2RX_Handler
- .text          0x00002544        0x0 out/src/kernel/driver/gpio/gpio.o
- .text          0x00002544       0xcc out/src/kernel/driver/systick/systick.o
-                0x00002544                systick_init
-                0x00002598                systick_tick
-                0x000025c0                SysTick_Handler
- .text          0x00002610       0xcc out/src/kernel/driver/semihost/semihost.o
-                0x00002610                shst_putc
-                0x0000262e                shst_getc
-                0x00002648                shst_write
-                0x00002682                shst_read
- .text          0x000026dc      0x108 out/src/kernel/driver/timer/timer.o
-                0x000026dc                timer_init
-                0x00002760                timer_tick
-                0x00002782                TIMER0_Handler
-                0x000027b0                TIMER1_Handler
+                0x00001ee8                timer_queue_advance
+ .text          0x00001f6a        0x0 out/src/kernel/driver/led/led.o
+ *fill*         0x00001f6a        0x2 
+ .text          0x00001f6c      0x5f0 out/src/kernel/driver/serial/serial.o
+                0x00001f6c                sbuf_empty
+                0x00001f90                sbuf_full
+                0x00001fba                sbuf_pop
+                0x00001fe6                sbuf_push
+                0x00002014                uart_init
+                0x000020bc                uart_putc
+                0x000020ee                uart_getc
+                0x0000211c                uart_write
+                0x000021da                uart_read
+                0x000022a8                UART0TX_Handler
+                0x000022f8                UART0RX_Handler
+                0x00002394                UART1TX_Handler
+                0x000023e0                UART1RX_Handler
+                0x00002478                UART2TX_Handler
+                0x000024c4                UART2RX_Handler
+ .text          0x0000255c        0x0 out/src/kernel/driver/gpio/gpio.o
+ .text          0x0000255c       0xcc out/src/kernel/driver/systick/systick.o
+                0x0000255c                systick_init
+                0x000025b0                systick_tick
+                0x000025d8                SysTick_Handler
+ .text          0x00002628       0xcc out/src/kernel/driver/semihost/semihost.o
+                0x00002628                shst_putc
+                0x00002646                shst_getc
+                0x00002660                shst_write
+                0x0000269a                shst_read
+ .text          0x000026f4      0x108 out/src/kernel/driver/timer/timer.o
+                0x000026f4                timer_init
+                0x00002778                timer_tick
+                0x0000279a                TIMER0_Handler
+                0x000027c8                TIMER1_Handler
  *(.rodata*)
- .rodata        0x000027e4        0x4 out/src/user/process/process_b.o
- .rodata        0x000027e8        0x3 out/src/user/lib/format/format.o
- *fill*         0x000027eb        0x1 
- .rodata        0x000027ec       0x2c out/src/kernel/log/log.o
- .rodata        0x00002818      0x130 out/src/kernel/process/process.o
- .rodata        0x00002948       0x33 out/src/kernel/kernel.o
- *fill*         0x0000297b        0x1 
- .rodata        0x0000297c      0x1d1 out/src/kernel/handler/handler.o
- *fill*         0x00002b4d        0x3 
- .rodata        0x00002b50      0x2da out/src/kernel/syscall/syscall.o
-                0x00002e2c                        . = ALIGN (0x4)
- *fill*         0x00002e2a        0x2 
-                0x00002e2c                        _etext = .
+ .rodata        0x000027fc        0x4 out/src/user/process/process_b.o
+ .rodata        0x00002800        0x3 out/src/user/lib/format/format.o
+ *fill*         0x00002803        0x1 
+ .rodata        0x00002804       0x2c out/src/kernel/log/log.o
+ .rodata        0x00002830      0x130 out/src/kernel/process/process.o
+ .rodata        0x00002960       0x33 out/src/kernel/kernel.o
+ *fill*         0x00002993        0x1 
+ .rodata        0x00002994      0x1d1 out/src/kernel/handler/handler.o
+ *fill*         0x00002b65        0x3 
+ .rodata        0x00002b68      0x2da out/src/kernel/syscall/syscall.o
+                0x00002e44                        . = ALIGN (0x4)
+ *fill*         0x00002e42        0x2 
+                0x00002e44                        _etext = .
 
-.glue_7         0x00002e2c        0x0
- .glue_7        0x00002e2c        0x0 linker stubs
+.glue_7         0x00002e44        0x0
+ .glue_7        0x00002e44        0x0 linker stubs
 
-.glue_7t        0x00002e2c        0x0
- .glue_7t       0x00002e2c        0x0 linker stubs
+.glue_7t        0x00002e44        0x0
+ .glue_7t       0x00002e44        0x0 linker stubs
 
-.vfp11_veneer   0x00002e2c        0x0
- .vfp11_veneer  0x00002e2c        0x0 linker stubs
+.vfp11_veneer   0x00002e44        0x0
+ .vfp11_veneer  0x00002e44        0x0 linker stubs
 
-.v4_bx          0x00002e2c        0x0
- .v4_bx         0x00002e2c        0x0 linker stubs
+.v4_bx          0x00002e44        0x0
+ .v4_bx         0x00002e44        0x0 linker stubs
 
-.iplt           0x00002e2c        0x0
- .iplt          0x00002e2c        0x0 out/src/kernel/pendsv/pendsv_asm.o
+.iplt           0x00002e44        0x0
+ .iplt          0x00002e44        0x0 out/src/kernel/pendsv/pendsv_asm.o
 
-.rel.dyn        0x00002e2c        0x0
- .rel.iplt      0x00002e2c        0x0 out/src/kernel/pendsv/pendsv_asm.o
+.rel.dyn        0x00002e44        0x0
+ .rel.iplt      0x00002e44        0x0 out/src/kernel/pendsv/pendsv_asm.o
 
-.data           0x20000000      0x29c load address 0x00002e2c
+.data           0x20000000      0x29c load address 0x00002e44
                 0x20000000                        . = ALIGN (0x4)
                 0x20000000                        _sdata = .
  *(EXCLUDE_FILE(*idle*.o *process*.o) .data*)
@@ -295,9 +296,9 @@ LOAD out/src/kernel/driver/timer/timer.o
  .data          0x20000000        0x0 out/src/kernel/control/control_asm.o
  .data          0x20000000        0x0 out/src/kernel/startup/startup.o
  .data          0x20000000        0x0 out/src/kernel/driver/semihost/semihost_asm.o
- .data          0x20000000        0x0 /tmp/cc7UhLPe.o
- .data          0x20000000        0x0 /tmp/ccPLNjkj.o
- .data          0x20000000        0x0 /tmp/cctYCAdG.o
+ .data          0x20000000        0x0 /tmp/ccokcmlJ.o
+ .data          0x20000000        0x0 /tmp/ccjsQm0X.o
+ .data          0x20000000        0x0 /tmp/ccveIKIp.o
  .data          0x20000000        0x0 out/src/user/lib/spinlock/spinlock.o
  .data          0x20000000        0x0 out/src/user/lib/stdio/stdio.o
  .data          0x20000000        0x0 out/src/user/lib/util/util.o
@@ -327,12 +328,12 @@ LOAD out/src/kernel/driver/timer/timer.o
                 0x2000029c                        . = ALIGN (0x4)
                 0x2000029c                        _edata = .
  .data          0x2000029c        0x0 out/src/kernel/process/process.o
-                0x00002e2c                        _sidata = LOADADDR (.data)
+                0x00002e44                        _sidata = LOADADDR (.data)
 
-.igot.plt       0x2000029c        0x0 load address 0x000030c8
+.igot.plt       0x2000029c        0x0 load address 0x000030e0
  .igot.plt      0x2000029c        0x0 out/src/kernel/pendsv/pendsv_asm.o
 
-.bss            0x2000029c      0xa60 load address 0x000030c8
+.bss            0x2000029c      0xa60 load address 0x000030e0
                 0x2000029c                        . = ALIGN (0x4)
                 0x2000029c                        _sbss = .
  *(EXCLUDE_FILE(*idle*.o *process*.o) .bss*)
@@ -343,9 +344,9 @@ LOAD out/src/kernel/driver/timer/timer.o
  .bss           0x2000029c        0x0 out/src/kernel/control/control_asm.o
  .bss           0x2000029c        0x0 out/src/kernel/startup/startup.o
  .bss           0x2000029c        0x0 out/src/kernel/driver/semihost/semihost_asm.o
- .bss           0x2000029c        0x0 /tmp/cc7UhLPe.o
- .bss           0x2000029c        0x0 /tmp/ccPLNjkj.o
- .bss           0x2000029c        0x0 /tmp/cctYCAdG.o
+ .bss           0x2000029c        0x0 /tmp/ccokcmlJ.o
+ .bss           0x2000029c        0x0 /tmp/ccjsQm0X.o
+ .bss           0x2000029c        0x0 /tmp/ccveIKIp.o
  .bss           0x2000029c        0x0 out/src/user/lib/spinlock/spinlock.o
  .bss           0x2000029c        0x0 out/src/user/lib/stdio/stdio.o
  .bss           0x2000029c        0x0 out/src/user/lib/util/util.o
@@ -388,16 +389,16 @@ LOAD out/src/kernel/driver/timer/timer.o
  *fill*         0x20001000      0x400 
                 0x20001400                        __idle_estack = .
 
-.idle_data      0x20001400        0x0 load address 0x000030c8
+.idle_data      0x20001400        0x0 load address 0x000030e0
                 0x20001400                        . = ALIGN (0x4)
                 0x20001400                        __idle_sdata = .
  *idle.o(.data .data.*)
  .data          0x20001400        0x0 out/src/user/process/idle.o
                 0x20001400                        . = ALIGN (0x4)
                 0x20001400                        __idle_edata = .
-                0x000030c8                        __idle_sidata = LOADADDR (.idle_data)
+                0x000030e0                        __idle_sidata = LOADADDR (.idle_data)
 
-.idle_bss       0x20001400        0x0 load address 0x000030c8
+.idle_bss       0x20001400        0x0 load address 0x000030e0
                 0x20001400                        . = ALIGN (0x4)
                 0x20001400                        __idle_sbss = .
  *idle.o(.bss .bss.*)
@@ -405,7 +406,7 @@ LOAD out/src/kernel/driver/timer/timer.o
                 0x20001400                        . = ALIGN (0x4)
                 0x20001400                        __idle_ebss = .
 
-.idle_pad       0x20001400      0xc00 load address 0x000030c8
+.idle_pad       0x20001400      0xc00 load address 0x000030e0
                 0x20002000                        . = (__idle_spart + _part_size)
  *fill*         0x20001400      0xc00 
                 0x20002000                        __idle_epart = .
@@ -419,16 +420,16 @@ LOAD out/src/kernel/driver/timer/timer.o
                 0x20002400                        __process_a_estack = .
 
 .process_a_data
-                0x20002400        0x0 load address 0x000030c8
+                0x20002400        0x0 load address 0x000030e0
                 0x20002400                        . = ALIGN (0x4)
                 0x20002400                        __process_a_sdata = .
  *process_a.o(.data .data.*)
  .data          0x20002400        0x0 out/src/user/process/process_a.o
                 0x20002400                        . = ALIGN (0x4)
                 0x20002400                        __process_a_edata = .
-                0x000030c8                        __process_a_sidata = LOADADDR (.process_a_data)
+                0x000030e0                        __process_a_sidata = LOADADDR (.process_a_data)
 
-.process_a_bss  0x20002400        0x0 load address 0x000030c8
+.process_a_bss  0x20002400        0x0 load address 0x000030e0
                 0x20002400                        . = ALIGN (0x4)
                 0x20002400                        __process_a_sbss = .
  *process_a.o(.bss .bss.*)
@@ -436,7 +437,7 @@ LOAD out/src/kernel/driver/timer/timer.o
                 0x20002400                        . = ALIGN (0x4)
                 0x20002400                        __process_a_ebss = .
 
-.process_a_pad  0x20002400      0xc00 load address 0x000030c8
+.process_a_pad  0x20002400      0xc00 load address 0x000030e0
                 0x20003000                        . = (__process_a_spart + _part_size)
  *fill*         0x20002400      0xc00 
                 0x20003000                        __process_a_epart = .
@@ -450,16 +451,16 @@ LOAD out/src/kernel/driver/timer/timer.o
                 0x20003400                        __process_b_estack = .
 
 .process_b_data
-                0x20003400        0x0 load address 0x000030c8
+                0x20003400        0x0 load address 0x000030e0
                 0x20003400                        . = ALIGN (0x4)
                 0x20003400                        __process_b_sdata = .
  *process_b.o(.data .data.*)
  .data          0x20003400        0x0 out/src/user/process/process_b.o
                 0x20003400                        . = ALIGN (0x4)
                 0x20003400                        __process_b_edata = .
-                0x000030c8                        __process_b_sidata = LOADADDR (.process_b_data)
+                0x000030e0                        __process_b_sidata = LOADADDR (.process_b_data)
 
-.process_b_bss  0x20003400      0x100 load address 0x000030c8
+.process_b_bss  0x20003400      0x100 load address 0x000030e0
                 0x20003400                        . = ALIGN (0x4)
                 0x20003400                        __process_b_sbss = .
  *process_b.o(.bss .bss.*)
@@ -468,7 +469,7 @@ LOAD out/src/kernel/driver/timer/timer.o
                 0x20003500                        . = ALIGN (0x4)
                 0x20003500                        __process_b_ebss = .
 
-.process_b_pad  0x20003500      0xb00 load address 0x000030c8
+.process_b_pad  0x20003500      0xb00 load address 0x000030e0
                 0x20004000                        . = (__process_b_spart + _part_size)
  *fill*         0x20003500      0xb00 
                 0x20004000                        __process_b_epart = .
@@ -492,11 +493,11 @@ LOAD linker stubs
  .ARM.attributes
                 0x000000a2       0x1b out/src/kernel/driver/semihost/semihost_asm.o
  .ARM.attributes
-                0x000000bd       0x1b /tmp/cc7UhLPe.o
+                0x000000bd       0x1b /tmp/ccokcmlJ.o
  .ARM.attributes
-                0x000000d8       0x1b /tmp/ccPLNjkj.o
+                0x000000d8       0x1b /tmp/ccjsQm0X.o
  .ARM.attributes
-                0x000000f3       0x1b /tmp/cctYCAdG.o
+                0x000000f3       0x1b /tmp/ccveIKIp.o
  .ARM.attributes
                 0x0000010e       0x2d out/src/user/process/process_a.o
  .ARM.attributes
@@ -592,7 +593,7 @@ LOAD linker stubs
  .comment       0x0000001e        0x0 out/src/kernel/driver/timer/timer.o
                                  0x1f (size before relaxing)
 
-.debug_line     0x00000000     0x271c
+.debug_line     0x00000000     0x2729
  .debug_line    0x00000000       0x4b out/src/kernel/irq/irq_asm.o
  .debug_line    0x0000004b       0x4e out/src/kernel/atomic/atomic_asm.o
  .debug_line    0x00000099       0x48 out/src/kernel/wfi/wfi_asm.o
@@ -600,9 +601,9 @@ LOAD linker stubs
  .debug_line    0x0000012d       0x50 out/src/kernel/control/control_asm.o
  .debug_line    0x0000017d       0x65 out/src/kernel/startup/startup.o
  .debug_line    0x000001e2       0x48 out/src/kernel/driver/semihost/semihost_asm.o
- .debug_line    0x0000022a       0x66 /tmp/cc7UhLPe.o
- .debug_line    0x00000290       0x5d /tmp/ccPLNjkj.o
- .debug_line    0x000002ed       0x53 /tmp/cctYCAdG.o
+ .debug_line    0x0000022a       0x66 /tmp/ccokcmlJ.o
+ .debug_line    0x00000290       0x5d /tmp/ccjsQm0X.o
+ .debug_line    0x000002ed       0x53 /tmp/ccveIKIp.o
  .debug_line    0x00000340       0x7c out/src/user/process/process_a.o
  .debug_line    0x000003bc       0x7e out/src/user/process/process_b.o
  .debug_line    0x0000043a       0x75 out/src/user/process/idle.o
@@ -616,16 +617,16 @@ LOAD linker stubs
  .debug_line    0x00001323       0xeb out/src/kernel/watchdog/watchdog.o
  .debug_line    0x0000140e      0x131 out/src/kernel/kernel.o
  .debug_line    0x0000153f      0x1bc out/src/kernel/handler/handler.o
- .debug_line    0x000016fb      0x3a0 out/src/kernel/syscall/syscall.o
- .debug_line    0x00001a9b      0x16b out/src/kernel/memory/memory.o
- .debug_line    0x00001c06       0xb5 out/src/kernel/pendsv/pendsv.o
- .debug_line    0x00001cbb      0x198 out/src/kernel/delay/delay.o
- .debug_line    0x00001e53        0x0 out/src/kernel/driver/led/led.o
- .debug_line    0x00001e53      0x489 out/src/kernel/driver/serial/serial.o
- .debug_line    0x000022dc        0x0 out/src/kernel/driver/gpio/gpio.o
- .debug_line    0x000022dc      0x17a out/src/kernel/driver/systick/systick.o
- .debug_line    0x00002456      0x113 out/src/kernel/driver/semihost/semihost.o
- .debug_line    0x00002569      0x1b3 out/src/kernel/driver/timer/timer.o
+ .debug_line    0x000016fb      0x398 out/src/kernel/syscall/syscall.o
+ .debug_line    0x00001a93      0x16b out/src/kernel/memory/memory.o
+ .debug_line    0x00001bfe       0xb5 out/src/kernel/pendsv/pendsv.o
+ .debug_line    0x00001cb3      0x1ad out/src/kernel/delay/delay.o
+ .debug_line    0x00001e60        0x0 out/src/kernel/driver/led/led.o
+ .debug_line    0x00001e60      0x489 out/src/kernel/driver/serial/serial.o
+ .debug_line    0x000022e9        0x0 out/src/kernel/driver/gpio/gpio.o
+ .debug_line    0x000022e9      0x17a out/src/kernel/driver/systick/systick.o
+ .debug_line    0x00002463      0x113 out/src/kernel/driver/semihost/semihost.o
+ .debug_line    0x00002576      0x1b3 out/src/kernel/driver/timer/timer.o
 
 .debug_line_str
                 0x00000000      0x15e
@@ -651,16 +652,16 @@ LOAD linker stubs
                 0x0000015e        0x0 out/src/kernel/driver/semihost/semihost_asm.o
                                  0x57 (size before relaxing)
  .debug_line_str
-                0x0000015e        0x0 /tmp/cc7UhLPe.o
+                0x0000015e        0x0 /tmp/ccokcmlJ.o
                                  0x44 (size before relaxing)
  .debug_line_str
-                0x0000015e        0x0 /tmp/ccPLNjkj.o
+                0x0000015e        0x0 /tmp/ccjsQm0X.o
                                  0x4e (size before relaxing)
  .debug_line_str
-                0x0000015e        0x0 /tmp/cctYCAdG.o
+                0x0000015e        0x0 /tmp/ccveIKIp.o
                                  0x4e (size before relaxing)
 
-.debug_info     0x00000000     0x4ef8
+.debug_info     0x00000000     0x4f83
  .debug_info    0x00000000       0x24 out/src/kernel/irq/irq_asm.o
  .debug_info    0x00000024       0x24 out/src/kernel/atomic/atomic_asm.o
  .debug_info    0x00000048       0x24 out/src/kernel/wfi/wfi_asm.o
@@ -668,9 +669,9 @@ LOAD linker stubs
  .debug_info    0x00000090       0x24 out/src/kernel/control/control_asm.o
  .debug_info    0x000000b4       0x24 out/src/kernel/startup/startup.o
  .debug_info    0x000000d8       0x24 out/src/kernel/driver/semihost/semihost_asm.o
- .debug_info    0x000000fc       0x24 /tmp/cc7UhLPe.o
- .debug_info    0x00000120       0x24 /tmp/ccPLNjkj.o
- .debug_info    0x00000144       0x24 /tmp/cctYCAdG.o
+ .debug_info    0x000000fc       0x24 /tmp/ccokcmlJ.o
+ .debug_info    0x00000120       0x24 /tmp/ccjsQm0X.o
+ .debug_info    0x00000144       0x24 /tmp/ccveIKIp.o
  .debug_info    0x00000168       0xff out/src/user/process/process_a.o
  .debug_info    0x00000267       0xe9 out/src/user/process/process_b.o
  .debug_info    0x00000350       0x9d out/src/user/process/idle.o
@@ -679,21 +680,21 @@ LOAD linker stubs
  .debug_info    0x00000bbc       0xd9 out/src/user/lib/util/util.o
  .debug_info    0x00000c95      0x3c3 out/src/user/lib/format/format.o
  .debug_info    0x00001058      0x24e out/src/kernel/log/log.o
- .debug_info    0x000012a6      0x6a9 out/src/kernel/atomic/atomic.o
- .debug_info    0x0000194f      0x6b0 out/src/kernel/process/process.o
- .debug_info    0x00001fff      0x13f out/src/kernel/watchdog/watchdog.o
- .debug_info    0x0000213e      0x310 out/src/kernel/kernel.o
- .debug_info    0x0000244e      0x2c8 out/src/kernel/handler/handler.o
- .debug_info    0x00002716      0xc90 out/src/kernel/syscall/syscall.o
- .debug_info    0x000033a6      0x19d out/src/kernel/memory/memory.o
- .debug_info    0x00003543      0x177 out/src/kernel/pendsv/pendsv.o
- .debug_info    0x000036ba      0x2d0 out/src/kernel/delay/delay.o
- .debug_info    0x0000398a      0x91d out/src/kernel/driver/serial/serial.o
- .debug_info    0x000042a7      0x3d2 out/src/kernel/driver/systick/systick.o
- .debug_info    0x00004679      0x30a out/src/kernel/driver/semihost/semihost.o
- .debug_info    0x00004983      0x575 out/src/kernel/driver/timer/timer.o
+ .debug_info    0x000012a6      0x6b5 out/src/kernel/atomic/atomic.o
+ .debug_info    0x0000195b      0x6bc out/src/kernel/process/process.o
+ .debug_info    0x00002017      0x13f out/src/kernel/watchdog/watchdog.o
+ .debug_info    0x00002156      0x310 out/src/kernel/kernel.o
+ .debug_info    0x00002466      0x2c8 out/src/kernel/handler/handler.o
+ .debug_info    0x0000272e      0xc9c out/src/kernel/syscall/syscall.o
+ .debug_info    0x000033ca      0x19d out/src/kernel/memory/memory.o
+ .debug_info    0x00003567      0x177 out/src/kernel/pendsv/pendsv.o
+ .debug_info    0x000036de      0x313 out/src/kernel/delay/delay.o
+ .debug_info    0x000039f1      0x929 out/src/kernel/driver/serial/serial.o
+ .debug_info    0x0000431a      0x3de out/src/kernel/driver/systick/systick.o
+ .debug_info    0x000046f8      0x30a out/src/kernel/driver/semihost/semihost.o
+ .debug_info    0x00004a02      0x581 out/src/kernel/driver/timer/timer.o
 
-.debug_abbrev   0x00000000     0x1e6a
+.debug_abbrev   0x00000000     0x1e81
  .debug_abbrev  0x00000000       0x14 out/src/kernel/irq/irq_asm.o
  .debug_abbrev  0x00000014       0x14 out/src/kernel/atomic/atomic_asm.o
  .debug_abbrev  0x00000028       0x14 out/src/kernel/wfi/wfi_asm.o
@@ -701,9 +702,9 @@ LOAD linker stubs
  .debug_abbrev  0x00000050       0x14 out/src/kernel/control/control_asm.o
  .debug_abbrev  0x00000064       0x14 out/src/kernel/startup/startup.o
  .debug_abbrev  0x00000078       0x14 out/src/kernel/driver/semihost/semihost_asm.o
- .debug_abbrev  0x0000008c       0x14 /tmp/cc7UhLPe.o
- .debug_abbrev  0x000000a0       0x14 /tmp/ccPLNjkj.o
- .debug_abbrev  0x000000b4       0x14 /tmp/cctYCAdG.o
+ .debug_abbrev  0x0000008c       0x14 /tmp/ccokcmlJ.o
+ .debug_abbrev  0x000000a0       0x14 /tmp/ccjsQm0X.o
+ .debug_abbrev  0x000000b4       0x14 /tmp/ccveIKIp.o
  .debug_abbrev  0x000000c8       0xb5 out/src/user/process/process_a.o
  .debug_abbrev  0x0000017d       0xa2 out/src/user/process/process_b.o
  .debug_abbrev  0x0000021f       0x63 out/src/user/process/idle.o
@@ -720,11 +721,11 @@ LOAD linker stubs
  .debug_abbrev  0x00001033      0x2b3 out/src/kernel/syscall/syscall.o
  .debug_abbrev  0x000012e6       0xf9 out/src/kernel/memory/memory.o
  .debug_abbrev  0x000013df       0xa3 out/src/kernel/pendsv/pendsv.o
- .debug_abbrev  0x00001482      0x171 out/src/kernel/delay/delay.o
- .debug_abbrev  0x000015f3      0x30d out/src/kernel/driver/serial/serial.o
- .debug_abbrev  0x00001900      0x1db out/src/kernel/driver/systick/systick.o
- .debug_abbrev  0x00001adb      0x15d out/src/kernel/driver/semihost/semihost.o
- .debug_abbrev  0x00001c38      0x232 out/src/kernel/driver/timer/timer.o
+ .debug_abbrev  0x00001482      0x188 out/src/kernel/delay/delay.o
+ .debug_abbrev  0x0000160a      0x30d out/src/kernel/driver/serial/serial.o
+ .debug_abbrev  0x00001917      0x1db out/src/kernel/driver/systick/systick.o
+ .debug_abbrev  0x00001af2      0x15d out/src/kernel/driver/semihost/semihost.o
+ .debug_abbrev  0x00001c4f      0x232 out/src/kernel/driver/timer/timer.o
 
 .debug_aranges  0x00000000      0x3e0
  .debug_aranges
@@ -742,11 +743,11 @@ LOAD linker stubs
  .debug_aranges
                 0x000000c0       0x20 out/src/kernel/driver/semihost/semihost_asm.o
  .debug_aranges
-                0x000000e0       0x20 /tmp/cc7UhLPe.o
+                0x000000e0       0x20 /tmp/ccokcmlJ.o
  .debug_aranges
-                0x00000100       0x20 /tmp/ccPLNjkj.o
+                0x00000100       0x20 /tmp/ccjsQm0X.o
  .debug_aranges
-                0x00000120       0x20 /tmp/cctYCAdG.o
+                0x00000120       0x20 /tmp/ccveIKIp.o
  .debug_aranges
                 0x00000140       0x20 out/src/user/process/process_a.o
  .debug_aranges
@@ -790,75 +791,75 @@ LOAD linker stubs
  .debug_aranges
                 0x000003c0       0x20 out/src/kernel/driver/timer/timer.o
 
-.debug_str      0x00000000     0x12a4
- .debug_str     0x00000000     0x12a4 out/src/kernel/irq/irq_asm.o
+.debug_str      0x00000000     0x12bc
+ .debug_str     0x00000000     0x12bc out/src/kernel/irq/irq_asm.o
                                  0x52 (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/kernel/atomic/atomic_asm.o
+ .debug_str     0x000012bc        0x0 out/src/kernel/atomic/atomic_asm.o
                                  0x58 (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/kernel/wfi/wfi_asm.o
+ .debug_str     0x000012bc        0x0 out/src/kernel/wfi/wfi_asm.o
                                  0x52 (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/kernel/pendsv/pendsv_asm.o
+ .debug_str     0x000012bc        0x0 out/src/kernel/pendsv/pendsv_asm.o
                                  0x58 (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/kernel/control/control_asm.o
+ .debug_str     0x000012bc        0x0 out/src/kernel/control/control_asm.o
                                  0x5a (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/kernel/startup/startup.o
+ .debug_str     0x000012bc        0x0 out/src/kernel/startup/startup.o
                                  0x56 (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/kernel/driver/semihost/semihost_asm.o
+ .debug_str     0x000012bc        0x0 out/src/kernel/driver/semihost/semihost_asm.o
                                  0x63 (size before relaxing)
- .debug_str     0x000012a4        0x0 /tmp/cc7UhLPe.o
+ .debug_str     0x000012bc        0x0 /tmp/ccokcmlJ.o
                                  0x50 (size before relaxing)
- .debug_str     0x000012a4        0x0 /tmp/ccPLNjkj.o
+ .debug_str     0x000012bc        0x0 /tmp/ccjsQm0X.o
                                  0x5a (size before relaxing)
- .debug_str     0x000012a4        0x0 /tmp/cctYCAdG.o
+ .debug_str     0x000012bc        0x0 /tmp/ccveIKIp.o
                                  0x5a (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/user/process/process_a.o
+ .debug_str     0x000012bc        0x0 out/src/user/process/process_a.o
                                 0x16c (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/user/process/process_b.o
+ .debug_str     0x000012bc        0x0 out/src/user/process/process_b.o
                                 0x167 (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/user/process/idle.o
+ .debug_str     0x000012bc        0x0 out/src/user/process/idle.o
                                 0x14f (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/user/lib/spinlock/spinlock.o
+ .debug_str     0x000012bc        0x0 out/src/user/lib/spinlock/spinlock.o
                                 0x187 (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/user/lib/stdio/stdio.o
+ .debug_str     0x000012bc        0x0 out/src/user/lib/stdio/stdio.o
                                 0x296 (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/user/lib/util/util.o
+ .debug_str     0x000012bc        0x0 out/src/user/lib/util/util.o
                                 0x14a (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/user/lib/format/format.o
+ .debug_str     0x000012bc        0x0 out/src/user/lib/format/format.o
                                 0x1bc (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/kernel/log/log.o
+ .debug_str     0x000012bc        0x0 out/src/kernel/log/log.o
                                 0x1c6 (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/kernel/atomic/atomic.o
-                                0x395 (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/kernel/process/process.o
-                                0x57c (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/kernel/watchdog/watchdog.o
+ .debug_str     0x000012bc        0x0 out/src/kernel/atomic/atomic.o
+                                0x3ad (size before relaxing)
+ .debug_str     0x000012bc        0x0 out/src/kernel/process/process.o
+                                0x594 (size before relaxing)
+ .debug_str     0x000012bc        0x0 out/src/kernel/watchdog/watchdog.o
                                 0x1a8 (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/kernel/kernel.o
+ .debug_str     0x000012bc        0x0 out/src/kernel/kernel.o
                                 0x26d (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/kernel/handler/handler.o
+ .debug_str     0x000012bc        0x0 out/src/kernel/handler/handler.o
                                 0x258 (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/kernel/syscall/syscall.o
-                                0x5ca (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/kernel/memory/memory.o
+ .debug_str     0x000012bc        0x0 out/src/kernel/syscall/syscall.o
+                                0x5e2 (size before relaxing)
+ .debug_str     0x000012bc        0x0 out/src/kernel/memory/memory.o
                                 0x1c0 (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/kernel/pendsv/pendsv.o
+ .debug_str     0x000012bc        0x0 out/src/kernel/pendsv/pendsv.o
                                 0x1a9 (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/kernel/delay/delay.o
-                                0x29d (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/kernel/driver/led/led.o
+ .debug_str     0x000012bc        0x0 out/src/kernel/delay/delay.o
+                                0x2d0 (size before relaxing)
+ .debug_str     0x000012bc        0x0 out/src/kernel/driver/led/led.o
                                  0xba (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/kernel/driver/serial/serial.o
-                                0x4af (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/kernel/driver/gpio/gpio.o
+ .debug_str     0x000012bc        0x0 out/src/kernel/driver/serial/serial.o
+                                0x4c7 (size before relaxing)
+ .debug_str     0x000012bc        0x0 out/src/kernel/driver/gpio/gpio.o
                                  0xbc (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/kernel/driver/systick/systick.o
-                                0x30f (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/kernel/driver/semihost/semihost.o
+ .debug_str     0x000012bc        0x0 out/src/kernel/driver/systick/systick.o
+                                0x327 (size before relaxing)
+ .debug_str     0x000012bc        0x0 out/src/kernel/driver/semihost/semihost.o
                                 0x24c (size before relaxing)
- .debug_str     0x000012a4        0x0 out/src/kernel/driver/timer/timer.o
-                                0x3bc (size before relaxing)
+ .debug_str     0x000012bc        0x0 out/src/kernel/driver/timer/timer.o
+                                0x3d4 (size before relaxing)
 
-.debug_frame    0x00000000     0x12a4
+.debug_frame    0x00000000     0x12a0
  .debug_frame   0x00000000       0x2c out/src/user/process/process_a.o
  .debug_frame   0x0000002c       0x2c out/src/user/process/process_b.o
  .debug_frame   0x00000058       0x2c out/src/user/process/idle.o
@@ -875,11 +876,11 @@ LOAD linker stubs
  .debug_frame   0x00000a88      0x314 out/src/kernel/syscall/syscall.o
  .debug_frame   0x00000d9c       0x94 out/src/kernel/memory/memory.o
  .debug_frame   0x00000e30       0x30 out/src/kernel/pendsv/pendsv.o
- .debug_frame   0x00000e60       0x5c out/src/kernel/delay/delay.o
- .debug_frame   0x00000ebc      0x234 out/src/kernel/driver/serial/serial.o
- .debug_frame   0x000010f0       0x7c out/src/kernel/driver/systick/systick.o
- .debug_frame   0x0000116c       0xa0 out/src/kernel/driver/semihost/semihost.o
- .debug_frame   0x0000120c       0x98 out/src/kernel/driver/timer/timer.o
+ .debug_frame   0x00000e60       0x58 out/src/kernel/delay/delay.o
+ .debug_frame   0x00000eb8      0x234 out/src/kernel/driver/serial/serial.o
+ .debug_frame   0x000010ec       0x7c out/src/kernel/driver/systick/systick.o
+ .debug_frame   0x00001168       0xa0 out/src/kernel/driver/semihost/semihost.o
+ .debug_frame   0x00001208       0x98 out/src/kernel/driver/timer/timer.o
 
 .debug_rnglists
                 0x00000000       0x17

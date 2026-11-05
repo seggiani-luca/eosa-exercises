@@ -151,8 +151,8 @@ void kmutex_unlock(mutex *mut, process *proc) {
 	uint32_t saved = irq_save();
 
 	if (mut->owner != proc) {
-		return; // enforce ownership
 		irq_restore(saved);
+		return; // enforce ownership
 	}
 
 	if (mut->queue) {

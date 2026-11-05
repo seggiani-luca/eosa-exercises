@@ -16,6 +16,12 @@ typedef enum {
 // process queue priorities
 typedef enum { PRIO_HIGH, PRIO_LOW, PRIO_IDLE } process_priority;
 
+// process block conditions
+typedef union {
+	unsigned int delta; // delay time delta
+	char *rx_buf;		// buffer for serial receiver (first char)
+} process_block_condition;
+
 // process descriptor
 typedef struct process {
 	// stack pointer
@@ -30,11 +36,8 @@ typedef struct process {
 	// process priority
 	process_priority prio;
 
-	// processor block conditino
-	union {
-		unsigned int delta; // delay time delta
-		char *rx_buf;		// buffer for serial receiver (first char)
-	} block;
+	// processor block condition
+	process_block_condition block;
 
 	// entry point
 	int (*entry)(void);

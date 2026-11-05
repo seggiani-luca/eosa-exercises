@@ -1,7 +1,10 @@
 #include "../include/delay.h"
+#include "../include/irq.h"
 
 // push to timer queue
 void timer_queue_push(timer_queue *queue, process *proc, unsigned int ms) {
+	uint32_t saved = irq_save();
+	
 	// block
 	proc->state = PROC_BLOCKED;
 
@@ -17,10 +20,14 @@ void timer_queue_push(timer_queue *queue, process *proc, unsigned int ms) {
 		(*queue)->block.delta -= ms;
 
 	*queue = proc;
+	
+	irq_restore(saved);
 }
 
 // advance time in timer queue
 void timer_queue_advance(timer_queue *queue, unsigned int ms) {
+	uint32_t saved = irq_save();
+
 	while (*queue && ms >= (*queue)->block.delta) {
 		ms -= (*queue)->block.delta;
 		process *ready = (*queue);
@@ -33,4 +40,6 @@ void timer_queue_advance(timer_queue *queue, unsigned int ms) {
 
 	if (*queue)
 		(*queue)->block.delta -= ms;
+
+	irq_restore(saved);
 }

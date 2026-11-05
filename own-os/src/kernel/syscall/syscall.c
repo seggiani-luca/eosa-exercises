@@ -70,17 +70,19 @@ timer_queue *get_timer_queue(int dev) {
 }
 
 // check buffer against process partition
-int check_buf(uintptr_t buf, size_t len, process* proc) {
+int check_buf(uintptr_t buf, size_t len, process *proc) {
 	// check buffer beginning
 	uintptr_t beg = proc->spart;
 	uintptr_t end = proc->epart;
-	if(buf < beg || buf >= end) return 0;
-	
+	if (buf < beg || buf >= end)
+		return 0;
+
 	// check buffer length
 	uintptr_t off = buf - beg;
 	size_t size = end - beg;
-	if(off > size || len > size - off) return 0;
-	
+	if (off > size || len > size - off)
+		return 0;
+
 	return 1;
 }
 
@@ -91,7 +93,7 @@ syscall_ret syscall_write(syscall_arg dev, syscall_arg buf, syscall_arg len) {
 		return -1;
 	}
 
-	if(!check_buf(buf, len, current)) {
+	if (!check_buf(buf, len, current)) {
 		kprintf("[kernel] invalid buffer\n");
 		return -1;
 	}
@@ -105,8 +107,8 @@ syscall_ret syscall_read(syscall_arg dev, syscall_arg buf, syscall_arg len) {
 		kprintf("[kernel] invalid character device\n");
 		return -1;
 	}
-	
-	if(!check_buf(buf, len, current)) {
+
+	if (!check_buf(buf, len, current)) {
 		kprintf("[kernel] invalid buffer\n");
 		return -1;
 	}
