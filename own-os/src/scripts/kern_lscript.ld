@@ -29,7 +29,7 @@ SECTIONS {
 	.data : {
 		. = ALIGN(4);
 		_sdata = .;
-		*(.data*)
+		*(EXCLUDE_FILE (*process*.o *idle*.o) .data*)
 		. = ALIGN(4);
 		_edata = .;
 	} > RAM AT > FLASH
@@ -39,7 +39,7 @@ SECTIONS {
 	.bss : {
 		. = ALIGN(4);
 		_sbss = .;
-		*(.bss*)
+		*(EXCLUDE_FILE (*process*.o *idle*.o) .bss*)
 		*(COMMON)
 		. = ALIGN(4);
 		_ebss = .;

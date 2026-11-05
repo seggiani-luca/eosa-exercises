@@ -1,4 +1,5 @@
 #include "../include/lib.h"
+
 PROCESS_PRIORITY(PRIO_IDLE)
 
 int idle_main(void) {

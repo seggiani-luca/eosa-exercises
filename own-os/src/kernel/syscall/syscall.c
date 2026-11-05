@@ -37,7 +37,6 @@ char_driver *get_char_dev(int dev) {
 	case SYS_SEMIHOST:
 		return &shst_driver;
 	default:
-		kprintf("Invalid character device\n");
 		return 0;
 	}
 }
@@ -52,7 +51,6 @@ timer_driver *get_timer_dev(int dev) {
 	case SYS_TIMER1:
 		return &timer1_driver;
 	default:
-		kprintf("Invalid timer device\n");
 		return 0;
 	}
 }
@@ -67,23 +65,51 @@ timer_queue *get_timer_queue(int dev) {
 	case SYS_TIMER1:
 		return &timer1_queue;
 	default:
-		kprintf("Invalid timer queue\n");
 		return 0;
 	}
 }
 
+// check buffer against process partition
+int check_buf(uintptr_t buf, size_t len, process* proc) {
+	// check buffer beginning
+	uintptr_t beg = proc->spart;
+	uintptr_t end = proc->epart;
+	if(buf < beg || buf >= end) return 0;
+	
+	// check buffer length
+	uintptr_t off = buf - beg;
+	size_t size = end - beg;
+	if(off > size || len > size - off) return 0;
+	
+	return 1;
+}
+
 syscall_ret syscall_write(syscall_arg dev, syscall_arg buf, syscall_arg len) {
 	char_driver *driver = get_char_dev(dev);
-	if (!driver)
+	if (!driver) {
+		kprintf("[kernel] invalid character device\n");
 		return -1;
+	}
+
+	if(!check_buf(buf, len, current)) {
+		kprintf("[kernel] invalid buffer\n");
+		return -1;
+	}
 
 	return driver->write(driver->ctx, (const char *)buf, len);
 }
 
 syscall_ret syscall_read(syscall_arg dev, syscall_arg buf, syscall_arg len) {
 	char_driver *driver = get_char_dev(dev);
-	if (!driver)
+	if (!driver) {
+		kprintf("[kernel] invalid character device\n");
 		return -1;
+	}
+	
+	if(!check_buf(buf, len, current)) {
+		kprintf("[kernel] invalid buffer\n");
+		return -1;
+	}
 
 	return driver->read(driver->ctx, (char *)buf, len);
 }
@@ -92,8 +118,10 @@ syscall_ret syscall_tick(syscall_arg dev,
 						 syscall_arg arg1 __attribute__((unused)),
 						 syscall_arg arg2 __attribute__((unused))) {
 	timer_driver *driver = get_timer_dev(dev);
-	if (!driver)
+	if (!driver) {
+		kprintf("[kernel] invalid timer device\n");
 		return -1;
+	}
 
 	return driver->tick(driver->ctx);
 }
@@ -101,8 +129,10 @@ syscall_ret syscall_tick(syscall_arg dev,
 syscall_ret syscall_delay(syscall_arg dev, syscall_arg ms,
 						  syscall_arg arg2 __attribute__((unused))) {
 	timer_queue *queue = get_timer_queue(dev);
-	if (!queue)
+	if (!queue) {
+		kprintf("[kernel] invalid timer queue\n");
 		return -1;
+	}
 
 	timer_queue_push(queue, current, ms);
 	scheduler();
@@ -113,11 +143,15 @@ syscall_ret syscall_delay(syscall_arg dev, syscall_arg ms,
 syscall_ret syscall_until(syscall_arg dev, syscall_arg ms,
 						  syscall_arg arg2 __attribute__((unused))) {
 	timer_queue *queue = get_timer_queue(dev);
-	if (!queue)
+	if (!queue) {
+		kprintf("[kernel] invalid timer queue\n");
 		return -1;
+	}
 	timer_driver *driver = get_timer_dev(dev);
-	if (!driver)
+	if (!driver) {
+		kprintf("[kernel] invalid timer device\n");
 		return -1;
+	}
 
 	// just sleep, only if needed
 	unsigned int delta = ms - driver->tick(driver->ctx);
@@ -165,8 +199,8 @@ syscall_ret syscall_sem_lock(syscall_arg sem,
 							 syscall_arg arg1 __attribute__((unused)),
 							 syscall_arg arg2 __attribute__((unused))) {
 	if (!is_ksem_valid((semaphore *)sem)) {
-		kprintf("Invalid semaphore\n");
-		return 0;
+		kprintf("[kernel] invalid semaphore\n");
+		return -1;
 	}
 
 	ksem_lock((semaphore *)sem, current);
@@ -179,8 +213,8 @@ syscall_ret syscall_sem_unlock(syscall_arg sem,
 							   syscall_arg arg1 __attribute__((unused)),
 							   syscall_arg arg2 __attribute__((unused))) {
 	if (!is_ksem_valid((semaphore *)sem)) {
-		kprintf("Invalid semaphore\n");
-		return 0;
+		kprintf("[kernel] invalid semaphore\n");
+		return -1;
 	}
 
 	ksem_unlock((semaphore *)sem);
@@ -191,8 +225,8 @@ syscall_ret syscall_sem_free(syscall_arg sem,
 							 syscall_arg arg1 __attribute__((unused)),
 							 syscall_arg arg2 __attribute__((unused))) {
 	if (!is_ksem_valid((semaphore *)sem)) {
-		kprintf("Invalid semaphore\n");
-		return 0;
+		kprintf("[kernel] invalid semaphore\n");
+		return -1;
 	}
 
 	ksem_free((semaphore *)sem);
@@ -210,8 +244,8 @@ syscall_ret syscall_mutex_lock(syscall_arg mut,
 							   syscall_arg arg1 __attribute__((unused)),
 							   syscall_arg arg2 __attribute__((unused))) {
 	if (!is_kmutex_valid((mutex *)mut)) {
-		kprintf("Invalid mutex\n");
-		return 0;
+		kprintf("[kernel] invalid mutex\n");
+		return -1;
 	}
 
 	kmutex_lock((mutex *)mut, current);
@@ -224,8 +258,8 @@ syscall_ret syscall_mutex_unlock(syscall_arg mut,
 								 syscall_arg arg1 __attribute__((unused)),
 								 syscall_arg arg2 __attribute__((unused))) {
 	if (!is_kmutex_valid((mutex *)mut)) {
-		kprintf("Invalid mutex\n");
-		return 0;
+		kprintf("[kernel] invalid mutex\n");
+		return -1;
 	}
 
 	kmutex_unlock((mutex *)mut, current);
@@ -236,8 +270,8 @@ syscall_ret syscall_mutex_free(syscall_arg mut,
 							   syscall_arg arg1 __attribute__((unused)),
 							   syscall_arg arg2 __attribute__((unused))) {
 	if (!is_kmutex_valid((mutex *)mut)) {
-		kprintf("Invalid mutex\n");
-		return 0;
+		kprintf("[kernel] invalid mutex\n");
+		return -1;
 	}
 
 	kmutex_free((mutex *)mut);
@@ -266,8 +300,8 @@ static const syscall_fn syscall_table[] = {
 #define SYSCALL_TABLE_SIZE (sizeof(syscall_table) / sizeof(syscall_fn))
 
 void dispatch_syscall(exception_frame *frame, uint32_t syscall) {
-	if (syscall < 0 || syscall >= SYSCALL_TABLE_SIZE) {
-		kprintf("Invalid system call\n");
+	if (syscall >= SYSCALL_TABLE_SIZE || !syscall_table[syscall]) {
+		kprintf("[kernel] invalid system call\n");
 		frame->r0 = (uint32_t)-1;
 		return;
 	}
