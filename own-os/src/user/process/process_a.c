@@ -1,9 +1,18 @@
 #include "../include/lib.h"
 PROCESS_PRIORITY(PRIO_HIGH)
 
-int process_a_main(void) {
-	pin_mode(SYS_GPIO0, 0, MODE_OUTPUT);
-	digital_write(SYS_GPIO0, 0, 1);
+int process_a_main(void)
+{
+    int *ptr = malloc(sizeof(int));
+    if (!ptr) {
+        printf("malloc() failed\n");
+        return 1;
+    }
 
-	return 0;
+    *ptr = 420;
+    printf("*ptr=%d\n", *ptr);
+
+    free(ptr);
+
+    return 0;
 }

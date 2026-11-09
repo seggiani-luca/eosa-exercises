@@ -5,31 +5,31 @@
 
 // semihosting operation types
 typedef enum {
-	SHST_OPEN = 0x01,	// opens a file/stream on the host
-	SHST_ISTTY = 0x09,	// checks if file handle on the host is a tty
-	SHST_WRITE = 0x05,	// writes a file/stream on the host
-	SHST_READ = 0x06,	// reads a file/stream on the host
-	SHST_CLOSE = 0x02,	// closes a file/stream on the host
-	SHST_FLEN = 0x0C,	// gets length of a file on the host
-	SHST_SEEK = 0x0A,	// seeks on a file/stream on the host
-	SHST_TMPNAM = 0x0D, // gets a temporary path on the host
-	SHST_REMOVE = 0x0E, // removes a file on the host
-	SHST_RENAME = 0x0F, // renames a file on the host
+    SHST_OPEN = 0x01,   // opens a file/stream on the host
+    SHST_ISTTY = 0x09,  // checks if file handle on the host is a tty
+    SHST_WRITE = 0x05,  // writes a file/stream on the host
+    SHST_READ = 0x06,   // reads a file/stream on the host
+    SHST_CLOSE = 0x02,  // closes a file/stream on the host
+    SHST_FLEN = 0x0C,   // gets length of a file on the host
+    SHST_SEEK = 0x0A,   // seeks on a file/stream on the host
+    SHST_TMPNAM = 0x0D, // gets a temporary path on the host
+    SHST_REMOVE = 0x0E, // removes a file on the host
+    SHST_RENAME = 0x0F, // renames a file on the host
 
-	SHST_WRITEC = 0x03, // writes a character on the host tty
-	SHST_WRITE0 = 0x04, // writes a NULL terminated string on the host tty
-	SHST_READC = 0x07,	// reads a character from the host tty
+    SHST_WRITEC = 0x03, // writes a character on the host tty
+    SHST_WRITE0 = 0x04, // writes a NULL terminated string on the host tty
+    SHST_READC = 0x07,  // reads a character from the host tty
 
-	SHST_CLOCK = 0x10,	  // gets processor time since program start
-	SHST_ELAPSED = 0x30,  // gets high-resolution timer
-	SHST_TICKFREQ = 0x31, // tick frequency for high-resolution timer
-	SHST_TIME = 0x11,	  // gets seconds since UNIX epoch
+    SHST_CLOCK = 0x10,    // gets processor time since program start
+    SHST_ELAPSED = 0x30,  // gets high-resolution timer
+    SHST_TICKFREQ = 0x31, // tick frequency for high-resolution timer
+    SHST_TIME = 0x11,     // gets seconds since UNIX epoch
 
-	SHST_ERRNO = 0x13,		 // gets errno from the host's libc
-	SHST_GET_CMDLINE = 0x15, // gets argc and argv from the hosts' libc
-	SHST_HEAPINFO = 0x16,	 // gets heap information from the host
-	SHST_ISERROR = 0x08,	 // tests whether a semihosting return means error
-	SHST_SYSTEM = 0x12		 // executes a command on the host's shell
+    SHST_ERRNO = 0x13,       // gets errno from the host's libc
+    SHST_GET_CMDLINE = 0x15, // gets argc and argv from the hosts' libc
+    SHST_HEAPINFO = 0x16,    // gets heap information from the host
+    SHST_ISERROR = 0x08,     // tests whether a semihosting return means error
+    SHST_SYSTEM = 0x12       // executes a command on the host's shell
 } sh_ops;
 
 // makes a semihosting call with the given operation and operand

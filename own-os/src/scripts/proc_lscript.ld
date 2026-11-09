@@ -9,7 +9,7 @@ SECTIONS {
         __idle_estack = .;
 	} > RAM
 
-	.idle_data : {
+    .idle_data : {
 		. = ALIGN(4);
         __idle_sdata = .;
 		*idle.o(.data .data.*)
@@ -40,7 +40,7 @@ SECTIONS {
         __process_a_estack = .;
 	} > RAM
 
-	.process_a_data : {
+    .process_a_data : {
 		. = ALIGN(4);
         __process_a_sdata = .;
 		*process_a.o(.data .data.*)

@@ -6,60 +6,59 @@
 /* process table */
 
 // process states
-typedef enum {
-	PROC_RUNNING,
-	PROC_READY,
-	PROC_BLOCKED,
-	PROC_TERMINATED
-} process_state;
+typedef enum { PROC_RUNNING, PROC_READY, PROC_BLOCKED, PROC_TERMINATED } process_state;
 
 // process queue priorities
 typedef enum { PRIO_HIGH, PRIO_LOW, PRIO_IDLE } process_priority;
 
 // process block conditions
 typedef union {
-	unsigned int delta; // delay time delta
-	char *rx_buf;		// buffer for serial receiver (first char)
+    unsigned int delta; // delay time delta
+    char *rx_buf;       // buffer for serial receiver (first char)
 } process_block_condition;
 
 // process descriptor
 typedef struct process {
-	// stack pointer
-	uint32_t sp;
+    // stack pointer
+    uint32_t sp;
 
-	// short name
-	const char *name;
+    // short name
+    const char *name;
 
-	// process state
-	process_state state;
+    // process state
+    process_state state;
 
-	// process priority
-	process_priority prio;
+    // process priority
+    process_priority prio;
 
-	// processor block condition
-	process_block_condition block;
+    // processor block condition
+    process_block_condition block;
 
-	// entry point
-	int (*entry)(void);
+    // entry point
+    int (*entry)(void);
 
-	// partition bounds
-	uintptr_t spart;
-	uintptr_t epart;
+    // partition bounds
+    uintptr_t spart;
+    uintptr_t epart;
 
-	// stack bounds
-	uintptr_t estack;
+    // stack bounds
+    uintptr_t estack;
 
-	// data bounds
-	uintptr_t sidata;
-	uintptr_t sdata;
-	uintptr_t edata;
+    // heap bounds
+    uintptr_t sheap;
+    uintptr_t eheap;
 
-	// bss bounds
-	uintptr_t sbss;
-	uintptr_t ebss;
+    // data bounds
+    uintptr_t sidata;
+    uintptr_t sdata;
+    uintptr_t edata;
 
-	// next process in queue
-	struct process *next;
+    // bss bounds
+    uintptr_t sbss;
+    uintptr_t ebss;
+
+    // next process in queue
+    struct process *next;
 } process;
 
 // initializes all processes

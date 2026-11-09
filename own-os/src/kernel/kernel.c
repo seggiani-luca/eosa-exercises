@@ -1,6 +1,7 @@
 #include "include/atomic.h"
 #include "include/cmsdk.h"
 #include "include/handler.h"
+#include "include/heap.h"
 #include "include/log.h"
 #include "include/memory.h"
 #include "include/process.h"
@@ -10,51 +11,65 @@
 #include "include/watchdog.h"
 #include "include/wfi.h"
 
-int kernel_main(void) {
-	// initialize fault and SVC handlers
-	handler_init();
+int kernel_main(void)
+{
+    // initialize fault and SVC handlers
+    handler_init();
 
-	// init terminal serial interface
-	uart_init(uart0_driver.ctx);
+    // init terminal serial interface
+    uart_init(uart0_driver.ctx);
 
-	// greet the user
-	kprintf("\nBooting into own-os v.0.0\n");
-	kprintf("Luca Seggiani - 2026\n\n");
+    // greet the user
+    kprintf("\nBooting into own-os v.0.0\n");
+    kprintf("Luca Seggiani - 2026\n\n");
 
-	// init all timers
-	timer_init(timer0_driver.ctx, 10);
-	timer_init(timer1_driver.ctx, 2000);
+    // init all timers
+    timer_init(timer0_driver.ctx, 10);
+    timer_init(timer1_driver.ctx, 2000);
 
-	// init all serial interfaces
-	uart_init(uart1_driver.ctx);
-	uart_init(uart2_driver.ctx);
+    // init all serial interfaces
+    uart_init(uart1_driver.ctx);
+    uart_init(uart2_driver.ctx);
 
-	// init watchdog
-	watchdog_init(10000);
+    // init watchdog
+    watchdog_init(10000);
 
-	// setup main MPU region
-	mem_init();
-	mem_region_set(0,			 // region 0 (FLASH)
-				   0x00000000,	 // base is 0x00000000
-				   0x00400000,	 // 4 MiB
-				   MPU_AP_RO_RO, // full read only
-				   1,			 // executable
-				   0			 // no srd
-	);
+    // setup main MPU region
+    mem_init();
+    mem_region_set(0,            // region 0 (FLASH)
+                   0x00000000,   // base is 0x00000000
+                   0x00400000,   // 4 MiB
+                   MPU_AP_RO_RO, // full read only
+                   1,            // executable
+                   0             // no srd
+    );
 
-	// initialize heaps
-	ksem_init_heap();	// semaphore heap
-	kmutex_init_heap(); // mutex heap
+    // setup heap MPU region
+    mem_region_set(2,                                       // region 2 (heap)
+                   (uintptr_t)&_sheap,                      // base of heap
+                   (uintptr_t)&_eheap - (uintptr_t)&_sheap, // size of heap
+                   MPU_AP_RW_RW,                            // full read/write
+                   0,                                       // no executable
+                   0                                        // no srd
+    );
 
-	// initialize processes
-	init_processes();
+    // initialize heaps
+    if (heap_init() < 0) { // userspace heap
+        kprintf("[kernel] couldn't initialize heap");
+        kpanic();
+    }
+    ksem_init_heap();   // semaphore heap
+    kmutex_init_heap(); // mutex heap
 
-	// init SysTick timer now, as it starts round robin
-	systick_init(0, 10);
+    // initialize processes
+    init_processes();
 
-	// bootstrap first process
-	start_process();
+    // init SysTick timer now, as it starts round robin
+    systick_init(0, 10);
 
-	for (;;)
-		wfi();
+    // bootstrap first process
+    start_process();
+
+    for (;;)
+        wfi();
 }

@@ -1,3 +1,29 @@
+BasedOnStyle: LLVM
+
 IndentWidth: 4
 TabWidth: 4
-UseTab: Always
+UseTab: Never
+
+ColumnLimit: 88
+
+BreakBeforeBraces: Linux
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+
+BinPackArguments: false
+BinPackParameters: false
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+
+AlignAfterOpenBracket: Align
+ContinuationIndentWidth: 4
+
+BreakConstructorInitializers: BeforeComma
+BreakBeforeBinaryOperators: NonAssignment
+BreakStringLiterals: true
+
+PointerAlignment: Right
+DerivePointerAlignment: false
+
+SortIncludes: Never

@@ -4,17 +4,17 @@
 
 // timer handling block
 typedef struct {
-	// timer
-	CMSDK_TIMER_TypeDef *timer;
+    // timer
+    CMSDK_TIMER_TypeDef *timer;
 
-	// IRQ number
-	int irq;
+    // IRQ number
+    int irq;
 
-	// tick period
-	int period;
+    // tick period
+    int period;
 
-	// current ticks
-	int ticks;
+    // current ticks
+    int ticks;
 } timer_block;
 
 // timer blocks
@@ -22,56 +22,58 @@ static timer_block timer0 = {.timer = CMSDK_TIMER0, .irq = TIMER0_IRQn};
 static timer_block timer1 = {.timer = CMSDK_TIMER1, .irq = TIMER1_IRQn};
 
 // drivers
-timer_driver timer0_driver = {
-	.init = timer_init, .tick = timer_tick, .ctx = &timer0};
-timer_driver timer1_driver = {
-	.init = timer_init, .tick = timer_tick, .ctx = &timer1};
+timer_driver timer0_driver = {.init = timer_init, .tick = timer_tick, .ctx = &timer0};
+timer_driver timer1_driver = {.init = timer_init, .tick = timer_tick, .ctx = &timer1};
 
 // queues
 timer_queue timer0_queue;
 timer_queue timer1_queue;
 
-void timer_init(void *ctx, int period_ms) {
-	timer_block *bl = ctx;
+void timer_init(void *ctx, int period_ms)
+{
+    timer_block *bl = ctx;
 
-	bl->ticks = 0;
-	bl->period = period_ms;
+    bl->ticks = 0;
+    bl->period = period_ms;
 
-	// stop timer
-	bl->timer->CTRL = 0;
+    // stop timer
+    bl->timer->CTRL = 0;
 
-	// enable NVIC interrupts
-	NVIC->IPR[bl->irq] = NVIC_TIMER_PRIO;
-	NVIC->ISER[bl->irq / 32] = 1UL << (bl->irq % 32);
+    // enable NVIC interrupts
+    NVIC->IPR[bl->irq] = NVIC_TIMER_PRIO;
+    NVIC->ISER[bl->irq / 32] = 1UL << (bl->irq % 32);
 
-	// load period
-	uint32_t reload = 25000U * period_ms;
-	bl->timer->RELOAD = reload;
-	bl->timer->VALUE = reload;
+    // load period
+    uint32_t reload = 25000U * period_ms;
+    bl->timer->RELOAD = reload;
+    bl->timer->VALUE = reload;
 
-	// start timer
-	bl->timer->CTRL = TIMER_CTRL_EN | TIMER_CTRL_IRQEN;
+    // start timer
+    bl->timer->CTRL = TIMER_CTRL_EN | TIMER_CTRL_IRQEN;
 }
 
-unsigned int timer_tick(void *ctx) {
-	timer_block *bl = ctx;
+unsigned int timer_tick(void *ctx)
+{
+    timer_block *bl = ctx;
 
-	return bl->ticks * bl->period;
+    return bl->ticks * bl->period;
 }
 
-void TIMER0_Handler(void) {
-	CMSDK_TIMER0->INTSTATUS = TIMER_INT_PENDING;
+void TIMER0_Handler(void)
+{
+    CMSDK_TIMER0->INTSTATUS = TIMER_INT_PENDING;
 
-	timer0.ticks++;
-	timer_queue_advance(&timer0_queue, timer0.period);
+    timer0.ticks++;
+    timer_queue_advance(&timer0_queue, timer0.period);
 }
 
-void TIMER1_Handler(void) {
-	CMSDK_TIMER1->INTSTATUS = TIMER_INT_PENDING;
+void TIMER1_Handler(void)
+{
+    CMSDK_TIMER1->INTSTATUS = TIMER_INT_PENDING;
 
-	timer1.ticks++;
-	timer_queue_advance(&timer1_queue, timer1.period);
+    timer1.ticks++;
+    timer_queue_advance(&timer1_queue, timer1.period);
 
-	// feed watchdog
-	watchdog_feed();
+    // feed watchdog
+    watchdog_feed();
 }

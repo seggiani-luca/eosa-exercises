@@ -160,4 +160,12 @@ int atoi(const char *s);
 // delay on systick
 #define sleep(ms) delay(SYS_SYSTICK, (ms))
 
+/* heap */
+
+// allocates a block of at least minimum given size
+void *malloc(unsigned int size);
+
+// frees a previously allocated block
+void free(void *ptr);
+
 #endif

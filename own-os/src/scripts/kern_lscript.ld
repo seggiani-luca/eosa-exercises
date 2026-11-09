@@ -6,10 +6,11 @@ MEMORY {
 ENTRY(Reset_Handler)
 
 _estack = ORIGIN(RAM) + LENGTH(RAM);
-_stack_size = 0x400; /* 1 KiB */
-_stack_limit = _estack - _stack_size;
 
-_part_size = 0x1000;
+/* process partitions */
+_stack_size = 0x400; /* 1 KiB */
+_part_size = 0x1000; /* 4 KiB */
+_heap_size = 0x1000; /* 1 KiB */
 
 SECTIONS {
 	.isr_vector : {
@@ -43,5 +44,13 @@ SECTIONS {
 		*(COMMON)
 		. = ALIGN(4);
 		_ebss = .;
+	} > RAM
+
+	.heap : {
+		. = ALIGN(_heap_size);
+		_sheap = .;
+		*(.heap*)
+		. = ALIGN(4);
+		_eheap = .;
 	} > RAM
 }

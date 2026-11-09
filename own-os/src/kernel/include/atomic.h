@@ -22,10 +22,10 @@ void dmb();
 
 // definition of semaphore
 typedef struct semaphore {
-	int tokens;
-	process_queue queue;
-	struct semaphore *next;
-	int alloc;
+    int tokens;
+    process_queue queue;
+    struct semaphore *next;
+    int alloc;
 } semaphore;
 
 // initializes semaphore heap
@@ -53,10 +53,10 @@ void ksem_free(semaphore *sem);
 
 // definition of mutex
 typedef struct mutex {
-	process *owner;
-	process_queue queue;
-	struct mutex *next;
-	int alloc;
+    process *owner;
+    process_queue queue;
+    struct mutex *next;
+    int alloc;
 } mutex;
 
 // initializes mutex heap

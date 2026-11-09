@@ -142,7 +142,7 @@ SECTIONS {{
         {p["estack"]} = .;
 	}} > RAM
 
-	.{p["name"]}_data : {{
+    .{p["name"]}_data : {{
 		. = ALIGN(4);
         {p["sdata"]} = .;
 		*{p["obj"]}(.data .data.*)
