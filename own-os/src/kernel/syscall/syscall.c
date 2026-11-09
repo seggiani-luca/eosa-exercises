@@ -8,6 +8,8 @@
 #include "../include/serial.h"
 #include "../include/systick.h"
 #include "../include/timer.h"
+#include "../include/led.h"
+#include "../include/gpio.h"
 #include <stdint.h>
 #include <strings.h>
 
@@ -64,6 +66,24 @@ timer_queue *get_timer_queue(int dev) {
 		return &timer0_queue;
 	case SYS_TIMER1:
 		return &timer1_queue;
+	default:
+		return 0;
+	}
+}
+
+// get bitwise device from id
+bitwise_driver *get_bitwise_dev(int dev) {
+	switch(dev) {
+	case SYS_GPIO0:
+		return &gpio0_driver;
+	case SYS_GPIO1:
+		return &gpio1_driver;
+	case SYS_GPIO2:
+		return &gpio2_driver;
+	case SYS_GPIO3:
+		return &gpio3_driver;
+	case SYS_FPGAIO:
+		return &fpgaio_driver;
 	default:
 		return 0;
 	}
@@ -280,11 +300,53 @@ syscall_ret syscall_mutex_free(syscall_arg mut,
 	return 0;
 }
 
+syscall_ret syscall_digital_write(syscall_arg dev,
+							     syscall_arg idx,
+							     syscall_arg val) {
+	bitwise_driver *driver = get_bitwise_dev(dev);
+	if (!driver) {
+		kprintf("[kernel] invalid bitwise device\n");
+		return -1;
+	}
+
+	driver->digital_write(driver->ctx, idx, val);
+	return 0;
+}
+
+syscall_ret syscall_digital_read(syscall_arg dev,
+							     syscall_arg idx,
+							     syscall_arg arg2 __attribute__((unused))) {
+	bitwise_driver *driver = get_bitwise_dev(dev);
+	if (!driver) {
+		kprintf("[kernel] invalid bitwise device\n");
+		return -1;
+	}
+
+	return driver->digital_read(driver->ctx, idx);
+}
+
+syscall_ret syscall_pin_mode(syscall_arg dev,
+                             syscall_arg idx,
+							 syscall_arg mode) {
+	bitwise_driver *driver = get_bitwise_dev(dev);
+	if (!driver) {
+		kprintf("[kernel] invalid bitwise device\n");
+		return -1;
+	}
+
+	if(driver->pin_mode)
+		driver->pin_mode(driver->ctx, idx, mode);
+	return 0;
+}
+
 // syscall table
 typedef syscall_ret (*syscall_fn)(syscall_arg, syscall_arg, syscall_arg);
 static const syscall_fn syscall_table[] = {
 	[SYS_WRITE] = syscall_write,
 	[SYS_READ] = syscall_read,
+	[SYS_DIGITAL_WRITE] = syscall_digital_write,
+	[SYS_DIGITAL_READ] = syscall_digital_read,
+	[SYS_PIN_MODE] = syscall_pin_mode,
 	[SYS_TICK] = syscall_tick,
 	[SYS_DELAY] = syscall_delay,
 	[SYS_UNTIL] = syscall_until,

@@ -30,6 +30,15 @@ extern unsigned int fwrite(int dev, const char *buf, unsigned int len);
 // request read from a character device
 extern unsigned int fread(int dev, char *buf, unsigned int len);
 
+// request write to a bitwise device
+extern void digital_write(int dev, int pin, int val);
+
+// request read from a bitwise device
+extern int digital_read(int dev, int pin);
+
+// request read from a bitwise device
+extern int pin_mode(int dev, int pin, int mode);
+
 // request counted ms from a timer
 extern int tick(int dev);
 

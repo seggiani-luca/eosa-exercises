@@ -4,10 +4,19 @@
 // defined system call types
 #define SYS_WRITE 1 // request write to a character device
 #define SYS_READ 2	// request read from a character device
-#define SYS_TICK 3	// request counted ms from a timer
-#define SYS_DELAY 4 // block, sleeping on a timer for given ms
-#define SYS_UNTIL 5 // block, sleeping on a timer until given ms
-#define SYS_YIELD 6 // yield control to scheduler
+
+// bitwise device pin modes
+#define MODE_INPUT 0
+#define MODE_OUTPUT 1
+
+#define SYS_DIGITAL_WRITE 8  // request write to a bitwise device
+#define SYS_DIGITAL_READ  9  // request read from a bitwise device
+#define SYS_PIN_MODE      10 // request bitwise device pin mode 
+
+#define SYS_TICK 16	 // request counted ms from a timer
+#define SYS_DELAY 17 // block, sleeping on a timer for given ms
+#define SYS_UNTIL 18 // block, sleeping on a timer until given ms
+#define SYS_YIELD 19 // yield control to scheduler
 
 #define SYS_SEM_NEW 64	  // reserves a semaphore
 #define SYS_SEM_LOCK 65	  // locks a semaphore
@@ -32,5 +41,12 @@
 #define SYS_SYSTICK 1
 #define SYS_TIMER0 2
 #define SYS_TIMER1 3
+
+// defined bitwise device aliases
+#define SYS_GPIO0 0
+#define SYS_GPIO1 1
+#define SYS_GPIO2 2
+#define SYS_GPIO3 3
+#define SYS_FPGAIO 4
 
 #endif

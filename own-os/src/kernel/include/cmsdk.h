@@ -198,6 +198,7 @@ typedef struct {
 	volatile uint32_t INTSTATUS; // interrupt status
 } CMSDK_TIMER_TypeDef;
 
+// board timers
 #define CMSDK_TIMER0 ((CMSDK_TIMER_TypeDef *)0x40000000UL)
 #define CMSDK_TIMER1 ((CMSDK_TIMER_TypeDef *)0x40001000UL)
 
@@ -221,10 +222,40 @@ typedef struct {
 	volatile uint32_t LOCK;	  // write key to unlock, anything else to lock
 } CMSDK_WDOG_TypeDef;
 
+// board watchdog
 #define CMSDK_WDOG ((CMSDK_WDOG_TypeDef *)0x40008000UL)
 
 #define WDOG_UNLOCK_KEY 0x1ACCE551UL // write it to LOCK to unlock
 #define WDOG_CTRL_INTEN (1UL << 0)	 // enable the interrupt (NMI)
 #define WDOG_CTRL_RESEN (1UL << 1)	 // reset the system on the second expiry
+
+/* GPIO */
+
+// GPIO typedef
+typedef struct {
+	volatile uint32_t DATA;			// read current pin levels
+	volatile uint32_t DATAOUT;		// value driven on the output pins
+	uint32_t RESERVED[2];			// gap up to 0x010
+	volatile uint32_t OUTENABLESET; // write 1 to make a pin an output
+	volatile uint32_t OUTENABLECLR; // write 1 to make a pin an input
+} CMSDK_GPIO_TypeDef;
+
+// board GPIOs
+#define CMSDK_GPIO0 ((CMSDK_GPIO_TypeDef *)0x40010000UL)
+#define CMSDK_GPIO1 ((CMSDK_GPIO_TypeDef *)0x40011000UL)
+#define CMSDK_GPIO2 ((CMSDK_GPIO_TypeDef *)0x40012000UL)
+#define CMSDK_GPIO3 ((CMSDK_GPIO_TypeDef *)0x40013000UL)
+
+/* FPGAIO */
+
+// FPGAIO typedef
+typedef struct {
+	volatile uint32_t LED;	  // one bit per LED: 1 = on
+	uint32_t RESERVED;		  // not used here
+	volatile uint32_t BUTTON; // one bit per button/switch (read only)
+} FPGAIO_TypeDef;
+
+// board FPGAIO
+#define FPGAIO ((FPGAIO_TypeDef *)0x40028000UL)
 
 #endif

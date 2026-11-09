@@ -16,6 +16,24 @@ fread:
     svc #SYS_READ
     bx lr
 
+.global digital_write 
+.thumb_func
+digital_write:
+    svc #SYS_DIGITAL_WRITE
+    bx lr
+
+.global digital_read 
+.thumb_func
+digital_read:
+    svc #SYS_DIGITAL_READ
+    bx lr
+
+.global pin_mode 
+.thumb_func
+pin_mode:
+    svc #SYS_PIN_MODE
+    bx lr
+
 .global tick
 .thumb_func
 tick:

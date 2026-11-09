@@ -40,7 +40,7 @@ QFLAGS_SHST := -machine mps2-an385 \
                -semihosting-config enable=on,target=native,chardev=stdio0 \
                -serial none
 
-QFLAGS := $(QFLAGS_UART)
+QFLAGS := $(QFLAGS_UART) -d unimp
 
 GDB := gdb 
 

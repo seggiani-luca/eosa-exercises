@@ -4,7 +4,7 @@
 // push to timer queue
 void timer_queue_push(timer_queue *queue, process *proc, unsigned int ms) {
 	uint32_t saved = irq_save();
-	
+
 	// block
 	proc->state = PROC_BLOCKED;
 
@@ -20,7 +20,7 @@ void timer_queue_push(timer_queue *queue, process *proc, unsigned int ms) {
 		(*queue)->block.delta -= ms;
 
 	*queue = proc;
-	
+
 	irq_restore(saved);
 }
 
