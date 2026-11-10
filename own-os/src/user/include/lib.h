@@ -168,4 +168,9 @@ void *malloc(unsigned int size);
 // frees a previously allocated block
 void free(void *ptr);
 
+/* shared memory */
+
+// places an object in shared memory
+#define SHARE __attribute__((section(".share")))
+
 #endif

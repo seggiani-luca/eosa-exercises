@@ -1,6 +1,26 @@
 #include "../../include/lib.h"
 #include <stdint.h>
 
+// heap is structured as follows:
+//
+// +---------------------------------------+ _sheap
+// | heap_control_t (28 B)                 |
+// +---------------------------------------+ _sheap + 28
+// | heap_block descriptors (8 B each)     |
+// +---------------------------------------+ _sheap + 28 + 8 * num_blocks
+// |                                       |
+// | SMALL region (variable)               |
+// |                                       |
+// +---------------------------------------+
+// |                                       |
+// | MEDIUM region (variable)              |
+// |                                       |
+// è---------------------------------------+
+// |                                       |
+// | LARGE region (variable)               |
+// |                                       |
+// +---------------------------------------+ _eheap
+
 // userspace heap parameters
 #define HEAP_SIZE 0x1000 /* 4 KiB */
 
@@ -8,17 +28,16 @@
 #define HEAP_MEDIUM_BLOCK_SIZE 128 // size of MEDIUM heap block
 #define HEAP_LARGE_BLOCK_SIZE 256  // size of LARGE heap block
 
-#define HEAP_LARGE_BOUND (HEAP_SIZE / 2) // blocks from here onwards are LARGE
-#define HEAP_MEDIUM_BOUND                                                              \
-    (HEAP_SIZE / 4) // blocks from here to next bound are MEDIUM
-                    // remaining blocks are SMALL
+#define HEAP_LARGE_BOUND (HEAP_SIZE / 2)  // LARGE block beg.
+#define HEAP_MEDIUM_BOUND (HEAP_SIZE / 4) // MEDIUM block beg.
+
 // the actual heap
 __attribute__((section(".heap"))) uint8_t heap[HEAP_SIZE];
 
 // heap block (8 bytes)
 typedef struct heap_block {
-    uintptr_t start;
-    struct heap_block *next;
+    uintptr_t start;         // region start, 0 signals taken
+    struct heap_block *next; // next region in list
 } heap_block;
 
 // heap control information
@@ -29,10 +48,11 @@ typedef struct {
     heap_block *free_large_blocks;
 
     // block counters
-    unsigned int num_blocks;
     unsigned int num_small_blocks;
     unsigned int num_medium_blocks;
     unsigned int num_large_blocks;
+
+    unsigned int num_blocks;
 } heap_control_t;
 
 // maps to heap control information in actual heap
@@ -163,18 +183,22 @@ heap_block *recover_block(uintptr_t ptr,
                           unsigned int block_count,
                           uintptr_t first_offset)
 {
+    // compute base, check against valid heap
     uintptr_t base = (uintptr_t)heap;
     if (ptr < base || ptr >= base + HEAP_SIZE)
         return 0;
 
+    // compute offset, check against first
     uintptr_t offset = ptr - base;
     if (offset > first_offset)
         return 0;
 
+    // compute delta from first
     uintptr_t delta = first_offset - offset;
     if (delta % block_size)
         return 0;
 
+    // delta correspons to index, check against actual num.
     unsigned int idx = delta / block_size;
     if (idx >= block_count)
         return 0;
@@ -199,6 +223,7 @@ void free(void *ptr)
                               0,
                               heap_control->num_large_blocks,
                               HEAP_SIZE - HEAP_LARGE_BLOCK_SIZE);
+
     } else if (beg > HEAP_MEDIUM_BOUND && beg <= HEAP_LARGE_BOUND) {
         free_blocks = &heap_control->free_medium_blocks;
         block = recover_block((uintptr_t)ptr,
@@ -206,6 +231,7 @@ void free(void *ptr)
                               heap_control->num_large_blocks,
                               heap_control->num_medium_blocks,
                               HEAP_LARGE_BOUND);
+
     } else if (beg >= sizeof(*heap_control)
                           + heap_control->num_blocks * sizeof(heap_block)
                && beg <= HEAP_MEDIUM_BOUND) {
@@ -216,6 +242,7 @@ void free(void *ptr)
                                   + heap_control->num_medium_blocks,
                               heap_control->num_small_blocks,
                               HEAP_MEDIUM_BOUND);
+
     } else {
         printf("[user] trying to free() outside heap at %x\n", ptr);
         return;

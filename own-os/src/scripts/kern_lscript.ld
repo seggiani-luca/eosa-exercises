@@ -8,9 +8,10 @@ ENTRY(Reset_Handler)
 _estack = ORIGIN(RAM) + LENGTH(RAM);
 
 /* process partitions */
-_stack_size = 0x400; /* 1 KiB */
-_part_size = 0x1000; /* 4 KiB */
-_heap_size = 0x1000; /* 1 KiB */
+_stack_size = 0x400;   /* 1 KiB */
+_part_size = 0x1000;   /* 4 KiB */
+_heap_align = 0x1000;  /* 1 KiB */
+_share_align = 0x1000; /* 1 KiB */
 
 SECTIONS {
 	.isr_vector : {
@@ -47,10 +48,18 @@ SECTIONS {
 	} > RAM
 
 	.heap : {
-		. = ALIGN(_heap_size);
+		. = ALIGN(_heap_align);
 		_sheap = .;
 		*(.heap*)
-		. = ALIGN(4);
+		. = ALIGN(_heap_align);
 		_eheap = .;
+	} > RAM
+	
+	.share : {
+		. = ALIGN(_share_align);
+		_sshare = .;
+		*(.share*)
+		. = ALIGN(_share_align);
+		_eshare = .;
 	} > RAM
 }

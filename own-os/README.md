@@ -7,23 +7,31 @@ Designed and implemented by **Luca Seggiani** (2026), based on some code provide
 ## Features
 
 - **Privilege Separation**: Kernel runs privileged using the Main Stack Pointer (`MSP`); user processes run unprivileged in Thread mode using the Process Stack Pointer (`PSP`).
-- **Memory Protection (MPU)**: Each process gets an independent 4 KiB RAM partition containing its stack, data, and BSS. Partitions are marked Execute-Never (`XN`). Flash is mapped globally read-only.
-- **Preemptive Scheduler**: Priority-based scheduling with three levels (`PRIO_HIGH`, `PRIO_LOW`, `PRIO_IDLE`) and round-robin timeslicing (`QUANTUM = 10 ms`).
-- **PendSV Context Switching**: Deferred context switches execute at the lowest exception priority (`0xF0`), keeping time-critical interrupts short.
+- **Memory Protection (MPU)**:
+  - **Process Isolation**: Each process gets an independent 4 KiB RAM partition containing its stack (1 KiB), data, and BSS, marked Execute-Never (`XN`).
+  - **Flash Protection**: Flash (4 MiB) is mapped globally read-only and executable.
+  - **Userspace Heap**: A dedicated 4 KiB heap region accessible to user processes.
+  - **Shared Memory**: Inter-process shared memory window (`SHARE`) allowing coordinated cross-process data sharing.
+- **Dynamic Heap Memory (`malloc` / `free`)**: Segregated-fit block allocator partitioning heap memory into small (64 B), medium (128 B), and large (256 B) blocks with bounds checking, alignment validation, and double-free detection.
+- **Preemptive Multilevel Scheduler**: Priority-based scheduling with three levels (`PRIO_HIGH`, `PRIO_LOW`, `PRIO_IDLE`) and round-robin timeslicing (`QUANTUM = 10 ms`).
+- **PendSV Context Switching**: Deferred context switches execute at the lowest exception priority (`0xF0`), keeping time-critical interrupts fast.
 - **Process Management**: Process state machine with `PROC_RUNNING`, `PROC_READY`, `PROC_BLOCKED`, and `PROC_TERMINATED` states. Runqueues and blocking queues use linked lists.
 - **Timer Primitives**:
   - `sleep(ms)` / `delay(dev, ms)`: Block the calling process for a relative duration.
-  - `until(dev, ms)`: Block until an absolute timestamp is reached.
-  - Timer queues use delta encoding to efficiently track pending wakeups.
+  - `until(dev, ms)`: Block until an absolute timer timestamp is reached.
+  - Timer queues use delta encoding to efficiently track pending wakeups without CPU spinning.
 - **Blocking Serial I/O**: Interrupt-driven UART receive with process wait queues. Reads block when no data is available and resume when characters arrive.
 - **Synchronization Primitives**:
-  - **Semaphores**: Kernel-managed counting semaphores with blocking lock operations and FIFO waiter queues.
-  - **Mutexes**: Kernel-managed mutual exclusion locks with ownership tracking and blocking wait queues.
-  - Both use fixed-size kernel object pools and IRQ-safe critical sections.
-- **Cooperative Yielding**: `yield()` allows a process to voluntarily give up the CPU.
-- **Hardware Drivers**: Three UARTs, SysTick, two CMSDK APB timers, semihosting, GPIO, and a hardware watchdog.
-- **Automated Process Generation**: `make_procs.py` discovers user processes, extracts their priorities, assigns aligned 4 KiB partitions, and generates the process table and linker script.
-- **Freestanding C Library**: Minimal user runtime providing formatted I/O, line input, timing, synchronization, and utility functions.
+  - **Spinlocks**: User-space atomic test-and-set locks with `ldrex`, `strex`, memory barriers (`dmb`), and cooperative yielding on contention.
+  - **Semaphores**: Kernel-managed counting semaphores with blocking wait queues and FIFO token release.
+  - **Mutexes**: Kernel-managed mutual exclusion locks with ownership tracking, blocking queues, and owner-only unlock enforcement.
+- **Bitwise Hardware Drivers (GPIO & LEDs)**:
+  - **CMSDK GPIO**: 4 GPIO controllers (GPIO0–GPIO3) supporting 16 pins each with configurable pin modes (`MODE_INPUT`, `MODE_OUTPUT`), digital write, and digital read.
+  - **MPS2 FPGAIO**: Board-level driver controlling 2 user LEDs and 2 user pushbuttons.
+- **Cooperative Yielding**: `yield()` allows a process to voluntarily give up the remainder of its timeslice.
+- **Hardware Drivers**: Ring-buffered UARTs (ports 0, 1, 2), SysTick timer, dual CMSDK APB timers, semihosting, 4 CMSDK GPIO ports, FPGAIO LEDs/buttons, and a hardware watchdog serviced via Timer 1.
+- **Automated Process Generation**: `make_procs.py` discovers user processes, extracts their priorities (`PROCESS_PRIORITY`), assigns aligned 4 KiB partitions, and generates the process table and linker script.
+- **Freestanding C Library**: Minimal user runtime providing formatted I/O, line input, timing, synchronization, heap allocation, bitwise pin operations, and utility functions.
 
 ## Architecture
 
@@ -51,10 +59,10 @@ Designed and implemented by **Luca Seggiani** (2026), based on some code provide
 |  |   context_out() -> scheduler() -> context_in()                    |  |
 |  +-------------------------------------------------------------------+  |
 |  |                    Blocking Subsystems                            |  |
-|  |   Timer Queues | UART Wait Queues | Semaphore Queues              |  |
+|  |   Timer Delta Queues | UART Wait Queues | Semaphore Wait Queues   |  |
 |  |   Mutex Wait Queues                                                |  |
 |  +-------------------------------------------------------------------+  |
-|  | Drivers: UART | SysTick | APB Timers | MPU | Watchdog | Semihost   |
+|  | Drivers: UART | SysTick | APB Timers | GPIO | FPGAIO | Watchdog    |  |
 |  +-------------------------------------------------------------------+  |
 |                          Uses MSP, Handler Mode                         |
 +-------------------------------------------------------------------------+
@@ -64,24 +72,99 @@ Designed and implemented by **Luca Seggiani** (2026), based on some code provide
 
 ## Memory & MPU Partitioning
 
-The MPU enforces hardware boundaries between kernel memory and user processes.
+The Cortex-M3 Memory Protection Unit (MPU) enforces hardware boundaries between kernel memory, individual processes, heap space, and shared memory.
 
-| Region | Memory | Base Address | Size | Access (Priv / Unpriv) | Executable |
-|---|---|---|---|---|---|
-| 0 | FLASH | `0x00000000` | 4 MiB | RO / RO | Yes |
-| 1 | Process partition | Dynamic (`spart`) | 4 KiB | RW / RW | No (XN) |
-| Default map | System memory | `*` | - | Privileged default map | - |
+| Region | Memory | Base Address | Size | Access (Priv / Unpriv) | Executable | Description |
+|---|---|---|---|---|---|---|
+| **0** | FLASH | `0x00000000` | 4 MiB | RO / RO | Yes | Vector table, kernel code, user code, constants |
+| **1** | Process partition | Dynamic (`spart`) | 4 KiB | RW / RW | No (XN) | Active process stack (1 KiB), data, and BSS |
+| **2** | Userspace Heap | `_sheap` | 4 KiB | RW / RW | No (XN) | Shared heap pool for dynamic `malloc`/`free` |
+| **3** | Shared Memory | `_sshare` | 4 KiB | RW / RW | No (XN) | Inter-process shared memory (`SHARE` section) |
+| **Default** | System Map | `*` | - | Privileged only | - | Kernel RAM (`0x20000000`), CMSDK peripherals |
 
-Region 0 contains the vector table, kernel code, user code, and read-only constants.
+- **Region 0** is configured statically at boot and covers Flash as read-only and executable.
+- **Region 1** is reconfigured on every context switch by `init_partition()` to point to the incoming process's dedicated 4 KiB RAM partition.
+- **Region 2** maps the 4 KiB heap section (`.heap`), allowing user processes to read and write dynamically allocated buffers.
+- **Region 3** maps the 4 KiB shared section (`.share`), allowing global variables declared with the `SHARE` macro to be accessed across processes.
+- **Buffer Safety**: System calls (`fwrite`, `fread`) validate buffer pointers using `check_buf()`, ensuring that user operations cannot read or write outside their assigned partition.
 
-Region 1 is reconfigured on each context switch to point to the incoming process partition. Each partition contains:
+## Heap Memory & Dynamic Allocation
 
-- Stack: 1 KiB.
-- Initialized data (`.data`).
-- Zero-initialized data (`.bss`).
-- Padding up to 4 KiB.
+The operating system includes a freestanding segregated-fit memory allocator (`src/user/lib/heap/heap.c`) initialized at boot via `heap_init()` and exposed via `malloc()` and `free()`.
 
-The default privileged memory map provides access to kernel RAM, peripherals, and system control registers. Unprivileged processes cannot access memory outside their configured MPU region or execute from RAM.
+### Heap Layout (`_sheap` to `_eheap`, 4 KiB)
+
+```text
++---------------------------------------+ _sheap (Base)
+| heap_control_t (28 B)                 | Control info (free list heads, counters)
++---------------------------------------+ _sheap + 28
+| heap_block descriptors (8 B each)     | Descriptor array (start address, next pointer)
++---------------------------------------+
+| SMALL Block Pool (64 B blocks)        | Allocations <= 64 bytes
++---------------------------------------+ HEAP_MEDIUM_BOUND (1 KiB)
+| MEDIUM Block Pool (128 B blocks)      | Allocations 65 - 128 bytes
++---------------------------------------+ HEAP_LARGE_BOUND (2 KiB)
+| LARGE Block Pool (256 B blocks)       | Allocations 129 - 256 bytes
++---------------------------------------+ _eheap (End, 4 KiB)
+```
+
+### Allocation & Freeing Semantics
+
+- **`malloc(size)`**:
+  - Allocations are routed to the smallest block class that fits:
+    - `size <= 64`: **SMALL** block pool.
+    - `65 <= size <= 128`: **MEDIUM** block pool.
+    - `129 <= size <= 256`: **LARGE** block pool.
+    - `size > 256`: Rejected (returns `NULL`).
+  - Pops the first available block from the appropriate free list, marks `block->start = 0` (in-use flag), and returns a pointer to the payload.
+- **`free(ptr)`**:
+  - Validates `ptr` against heap bounds.
+  - Uses `recover_block()` to determine the exact descriptor corresponding to `ptr` through arithmetic:
+    - Rejects addresses outside the heap (`[user] trying to free() outside heap`).
+    - Rejects misaligned pointers (`[user] misaligned free()`).
+    - Detects and rejects double-frees (`[user] double free()`).
+  - Restores the block descriptor's `start` pointer and pushes it back onto the appropriate free list.
+
+### Shared Memory (`SHARE`)
+
+Global variables can be marked with the `SHARE` attribute (`src/user/include/lib.h`):
+
+```c
+#define SHARE __attribute__((section(".share")))
+
+// Example: Inter-process shared synchronization primitive
+SHARE semaphore_t my_shared_sem;
+```
+
+Variables marked with `SHARE` reside in `.share` in RAM, mapped by MPU Region 3, allowing multiple processes to communicate and synchronize without triggering memory management faults.
+
+## Hardware Drivers & Peripherals
+
+| Driver | Location | Type | Details |
+|---|---|---|---|
+| **CMSDK UART (0, 1, 2)** | `src/kernel/driver/serial/` | Character | Ring-buffered TX/RX with interrupt-driven receive and blocking wait queues. |
+| **CMSDK GPIO (0, 1, 2, 3)** | `src/kernel/driver/gpio/` | Bitwise | 4 independent ports (16 pins each). Configures pin direction (`OUTENABLESET` / `OUTENABLECLR`), output data (`DATAOUT`), and input data (`DATA`). |
+| **MPS2 FPGAIO (LEDs & Buttons)** | `src/kernel/driver/led/` | Bitwise | Board-level interface controlling 2 user LEDs (`FPGAIO->LED`) and reading 2 user pushbuttons (`FPGAIO->BUTTON`). |
+| **SysTick Timer** | `src/kernel/driver/systick/` | Timer | 24-bit core down-counter driving scheduling quantum (`10 ms`), PendSV requests, and timer delta queue. |
+| **CMSDK APB Timers (0, 1)** | `src/kernel/driver/timer/` | Timer | Dual 25 MHz timers. Timer 0 provides 10 ms periodic ticks; Timer 1 runs at 2000 ms and feeds the watchdog. |
+| **Hardware Watchdog** | `src/kernel/watchdog/` | System | CMSDK watchdog with a 10-second timeout, unlocked via key `0x1ACCE551` and serviced by Timer 1. |
+| **ARM Semihosting** | `src/kernel/driver/semihost/` | Character | Debug console I/O using ARM `BKPT 0xAB` calls (`SHST_WRITEC`, `SHST_READC`). |
+
+### Bitwise Device Abstraction (`bitwise_driver`)
+
+Bitwise devices implement the standard interface defined in `src/kernel/include/driver.h`:
+
+```c
+typedef struct {
+    void (*init)(void *ctx);
+    void (*digital_write)(void *ctx, int idx, int val);
+    int (*digital_read)(void *ctx, int idx);
+    void (*pin_mode)(void *ctx, int idx, int mode);
+    void *ctx;
+} bitwise_driver;
+```
+
+Pins are configured as `MODE_INPUT` (0) or `MODE_OUTPUT` (1) and manipulated using `digital_write`, `digital_read`, and `pin_mode`.
 
 ## Process Lifecycle & Scheduler
 
@@ -102,255 +185,178 @@ typedef enum {
 } process_priority;
 
 typedef struct process {
-    uint32_t sp;
-    const char *name;
-    process_state state;
-    process_priority prio;
-	process_block_condition block; // conditions when in PROC_BLOCKED
-    int (*entry)(void);
-    uintptr_t spart, epart;
-    uintptr_t estack;
-    uintptr_t sidata, sdata, edata;
-    uintptr_t sbss, ebss;
-    struct process *next;
+    uint32_t sp;                     // Saved stack pointer (PSP)
+    const char *name;                // Process identifier
+    process_state state;             // Current execution state
+    process_priority prio;           // Scheduling priority
+    union {
+        unsigned int delta;          // Delta time for timer delay queue
+        char *rx_buf;                // Destination buffer for blocked serial read
+    } block;
+    int (*entry)(void);              // Main entry point
+    uintptr_t spart, epart;          // 4 KiB MPU partition bounds
+    uintptr_t estack;                // Initial stack pointer
+    uintptr_t sidata, sdata, edata;  // Initialized data bounds
+    uintptr_t sbss, ebss;            // Zero-initialized BSS bounds
+    struct process *next;            // Next pointer in process queue
 } process;
 ```
 
-### Initialization
+### Initialization & Boot
 
-1. `kernel_main()` initializes fault handlers, UARTs, timers, watchdog, and MPU Region 0.
-2. `handler_init()` configures exception priorities:
-   - SysTick and SVCall: `0xE0`.
-   - PendSV: `0xF0`.
-3. `init_processes()` loads the generated process table.
-   - Copies initialized data from Flash to RAM.
-   - Clears BSS.
-   - Initializes the process stack with an exception frame and callee-saved registers.
-   - Adds the process to its priority runqueue.
-4. `scheduler_next()` selects the highest-priority ready process, configures its MPU partition, and marks it `PROC_RUNNING`.
-5. `systick_init(0, 10)` configures the 10 ms system tick.
-6. `start_process()` drops privilege and enters the initial process.
+1. `kernel_main()` initializes fault handlers, UARTs, APB timers, watchdog, and MPU Region 0 (Flash).
+2. `mem_region_set` programs MPU Region 2 (Heap) and Region 3 (Shared Memory).
+3. `heap_init()` partitions the userspace heap into block pools.
+4. `ksem_init_heap()` and `kmutex_init_heap()` initialize synchronization object pools.
+5. `init_processes()` loads the process table:
+   - Copies initialized data (`.data`) from Flash to RAM.
+   - Zeroes `.bss`.
+   - Formats initial exception stack frames on `PSP` (`r0-r3, r12, lr, pc, xpsr`) and callee-saved registers (`r4-r11`).
+   - Enqueues processes into their designated priority runqueues (`high_prio_process_queue`, `low_prio_process_queue`, or `idle_process_queue`).
+6. `systick_init(0, 10)` starts the 10 ms periodic system tick.
+7. `start_process()` triggers `SYS_START_PROC`, drops privileges (`CONTROL[0] = 1`), and begins execution in unprivileged Thread mode.
 
 ### PendSV Context Switching
 
-SysTick and other interrupt handlers request context switches through PendSV rather than switching directly.
+Preemption is decoupled from interrupt handlers via the **PendSV** exception:
 
-The PendSV handler executes:
+1. `SysTick_Handler` fires every 10 ms:
+   - Advances time and wakes expired delta-timer tasks.
+   - Advances `quantum`. When `quantum >= QUANTUM` (10 ms), resets `quantum = 0` and calls `pendsv_request()` (`SCB->ICSR = SCB_ICSR_PENDSVSET`).
+2. PendSV is configured with the lowest exception priority (`0xF0`), guaranteeing that all time-critical ISRs complete before context switching begins.
+3. `PendSV_Handler` executes:
+   ```asm
+   PendSV_Handler:
+       bl context_out
+       bl scheduler
+       bl context_in
+       bx r0
+   ```
+   - `context_out()`: Pushes `r4-r11` to `PSP` and updates `current->sp`.
+   - `scheduler()`: Requeues the outgoing process if still runnable, calls `scheduler_next()` (checking High -> Low -> Idle queues), and reprograms MPU Region 1 for the new process.
+   - `context_in()`: Pops `r4-r11` from the incoming process's stack, restores `PSP`, and sets `r0 = 0xFFFFFFFD`.
+   - `bx r0`: Triggers hardware exception return, unstacking `r0-r3, r12, lr, pc, xPSR`.
 
-```asm
-PendSV_Handler:
-    bl context_out
-    bl scheduler
-    bl context_in
-    bx r0
+## Blocking & Synchronization Primitives
+
+### Timer Sleep (`sleep`, `delay`, `until`)
+
+- `delay(dev, ms)`: Blocks for a relative duration in milliseconds.
+- `sleep(ms)`: Delay convenience wrapper using `SYS_SYSTICK`.
+- `until(dev, ms)`: Blocks until an absolute timestamp is reached (`delta = ms - driver->tick()`).
+- Timer queues use delta encoding: nodes store the difference between consecutive deadlines. When the timer advances, expired tasks are transitioned from `PROC_BLOCKED` to `PROC_READY`.
+
+### Blocking Serial I/O (`fread`, `fgets`)
+
+- When reading from a serial device whose ring buffer is empty, `uart_read()` marks the process `PROC_BLOCKED`, stores the buffer destination in `current->block.rx_buf`, and pushes the task to the UART's `rx_queue`.
+- Upon character arrival, `UART0RX_Handler` removes the waiting task, delivers the byte, updates the return value, and transitions the process back to `PROC_READY`.
+
+### Spinlocks (`spinlock`)
+
+User-space spinlocks are implemented using ARM exclusive memory instructions:
+
+```c
+void spin_lock(spinlock *lock) {
+    for (;;) {
+        if (ldrex(lock) != 0)
+            yield(); // Yield CPU on contention
+        if (strex(lock, 1) == 0)
+            break;
+    }
+    dmb(); // Data memory barrier (acquire)
+}
+
+void spin_unlock(spinlock *lock) {
+    dmb();     // Data memory barrier (release)
+    *lock = 0;
+}
 ```
 
-- `context_out()` saves `r4-r11` to the outgoing process's PSP and stores the resulting stack pointer in `current->sp`.
-- `scheduler()` requeues the outgoing process if it is still running, selects the next ready process, and configures its MPU partition.
-- `context_in()` restores `r4-r11` and the incoming PSP.
-- Exception return restores the hardware exception frame (`r0-r3`, `r12`, `lr`, `pc`, `xPSR`).
+### Semaphores (`semaphore_t`)
 
-PendSV runs at the lowest exception priority, allowing higher-priority interrupts to finish before the context switch takes place.
+- Kernel-managed counting semaphores allocated from a fixed pool (`SEMAPHORE_NUM = 64`).
+- `sem_new(initial)`: Allocates a semaphore with initial token count.
+- `sem_lock(sem)`: Decrements token count; if zero, blocks the process in `sem->queue`.
+- `sem_unlock(sem)`: Wakes the first waiting process or increments token count.
+- `sem_free(sem)`: Wakes all remaining waiters and returns semaphore to the pool.
 
-### Scheduling
+### Mutexes (`mutex_t`)
 
-The scheduler uses three runqueues:
-
-- `high_prio_process_queue`
-- `low_prio_process_queue`
-- `idle_process_queue`
-
-The highest-priority nonempty queue is always selected first. Processes within the same priority level are scheduled round-robin.
-
-SysTick increments the scheduling quantum. When `QUANTUM` expires, it requests PendSV.
-
-## Blocking Primitives
-
-### Timer Sleep
-
-`sleep()`, `delay()` and `until()` use ordered timer delta queues.
-
-- `delay(dev, ms)` blocks the process for a relative duration.
-- `sleep(ms)` uses SysTick as its timer device.
-- `until(dev, ms)` blocks until an absolute timer timestamp.
-
-Each queue stores the difference between consecutive deadlines rather than absolute timestamps. On each timer tick, the queue head is advanced and expired processes are moved back to their priority runqueues.
-
-### Blocking Serial I/O
-
-`fread()` and `fgets()` use interrupt-driven UART receive queues.
-
-When no characters are available:
-
-1. The calling process is marked `PROC_BLOCKED`.
-2. Its destination buffer is stored in `current->block.rx_buf`.
-3. The process is inserted into the UART receive wait queue.
-4. The scheduler selects another process.
-
-When a character arrives, the UART RX interrupt:
-
-1. Removes a waiting process from the queue.
-2. Writes the received character into its destination buffer.
-3. Updates the saved return value.
-4. Marks the process `PROC_READY` and enqueues it.
-
-### Semaphores
-
-Semaphores provide counting synchronization between processes.
-
-The kernel maintains a fixed-size pool of semaphore objects (`SEMAPHORE_NUM`). Each semaphore contains:
-
-- A token counter.
-- A queue of blocked processes.
-- Allocation state.
-- A pointer used by the free-object list.
-
-Operations:
-
-- `sem_new(initial)`: Allocates a semaphore with an initial token count.
-- `sem_lock(sem)`: Consumes a token if available; otherwise blocks the calling process.
-- `sem_unlock(sem)`: Wakes a waiting process or increments the token count.
-- `sem_free(sem)`: Releases the semaphore and wakes its remaining waiters.
-
-Waiters are stored in process queues and resumed through the scheduler's normal priority runqueues.
-
-### Mutexes
-
-Mutexes provide mutual exclusion with ownership tracking.
-
-The kernel maintains a fixed-size pool of mutex objects (`MUTEX_NUM`). Each mutex contains:
-
-- An owner process pointer.
-- A queue of blocked processes.
-- Allocation state.
-- A pointer used by the free-object list.
-
-Operations:
-
+- Mutual exclusion locks with strict ownership tracking (`MUTEX_NUM = 64`).
 - `mutex_new()`: Allocates an unlocked mutex.
-- `mutex_lock(mut)`: Acquires an unowned mutex or blocks the calling process.
-- `mutex_unlock(mut)`: Releases the mutex if called by its owner. If waiters exist, ownership is transferred to the next waiter.
-- `mutex_free(mut)`: Releases the mutex and wakes its remaining waiters.
-
-Mutex ownership is enforced by the kernel: a process cannot unlock a mutex owned by another process.
-
-### Atomicity
-
-Semaphore and mutex operations use `irq_save()` / `irq_restore()` to protect shared kernel state against interrupt-level concurrency.
-
-This prevents races while modifying:
-
-- Free-object lists.
-- Token counters.
-- Mutex ownership.
-- Process wait queues.
-- Process states and ready queues.
-
-The synchronization objects themselves reside in kernel memory and are accessed through kernel-managed handles.
-
-### Cooperative Yielding
-
-`yield()` invokes `SYS_YIELD`, moving the calling process to the tail of its priority runqueue and scheduling another ready process.
-
-### Process Termination
-
-When a process returns from its entry function or calls `terminate()`, it invokes `SYS_EXIT_PROC`.
-
-The kernel marks the process `PROC_TERMINATED` and schedules another process without requeueing the terminated one.
-
-### Idle Process
-
-The idle process runs at `PRIO_IDLE` and yields while no higher-priority process is ready. It provides a fallback execution context when all other processes are blocked.
-
-## Hardware Drivers & Peripherals
-
-| Driver | Location | Details |
-|---|---|---|
-| CMSDK UART | `src/kernel/driver/serial/` | Three UARTs, ring-buffered TX/RX, interrupt-driven receive and blocking wait queues. |
-| SysTick | `src/kernel/driver/systick/` | 24-bit core down-counter, scheduling quantum and timer delta queue. |
-| CMSDK APB Timers | `src/kernel/driver/timer/` | Two timers clocked at 25 MHz. Timer 0 provides periodic ticks; Timer 1 feeds the watchdog. |
-| Watchdog | `src/kernel/watchdog/` | CMSDK watchdog with a 10-second timeout, serviced by Timer 1. |
-| Semihosting | `src/kernel/driver/semihost/` | Host debugging through ARM `BKPT 0xAB` calls. |
-| GPIO | `src/kernel/driver/gpio/` | CMSDK GPIO interface. |
+- `mutex_lock(mut)`: Acquires lock or blocks the process in `mut->queue`.
+- `mutex_unlock(mut)`: Enforces that **only the owner** can release the mutex. Wakes the next waiter and transfers ownership directly, or clears ownership if no waiters remain.
+- `mutex_free(mut)`: Wakes all waiters and recycles the mutex.
 
 ## Automated Process Generation
 
-The build system discovers and registers user processes automatically.
+The build system discovers and registers user processes automatically:
 
 ```text
 src/user/process/*.c
-        |
-        v
+        │
+        ▼
     make_procs.py
-        |
-        +--> Extract PROCESS_PRIORITY(...)
-        |
-        +--> Generate proc_lscript.ld
-        |
-        +--> Generate process.h
+        │
+        ├──► Extract PROCESS_PRIORITY(PRIO_*)  (defaults to PRIO_LOW)
+        ├──► Generate src/scripts/proc_lscript.ld
+        └──► Generate src/user/process/process.h
 ```
 
-For each process, the generator:
-
-1. Scans `src/user/process/` for C source files.
-2. Extracts `PROCESS_PRIORITY(PRIO_*)`, defaulting to `PRIO_LOW`.
-3. Generates linker sections for the stack, data, BSS, and partition padding.
-4. Assigns each process an aligned 4 KiB partition.
-5. Generates the process table and boundary symbol declarations.
-
-Adding a new process therefore requires only a new source file and an entry-point function following the `<name>_main` convention.
+For each process file:
+1. `make_procs.py` discovers all `.c` files in `src/user/process/`.
+2. Extracts `PROCESS_PRIORITY(...)` attributes.
+3. Generates linker partitions with 4 KiB alignments for stack, data, BSS, and padding.
+4. Generates `process.h` defining `init_process_table()` with entry functions (`<name>_main`), priority assignments, and boundary symbols.
 
 ## User Runtime & Standard Library
 
-User processes include `<lib.h>` for the available runtime functions.
+User processes include `<lib.h>` for standard runtime APIs:
 
 ### Process Management
-
-- `PROCESS_PRIORITY(p)`: Sets the process priority.
+- `PROCESS_PRIORITY(p)`: Sets priority (`PRIO_HIGH`, `PRIO_LOW`, `PRIO_IDLE`).
 - `yield()`: Voluntarily yields the CPU.
 - `terminate()`: Terminates the calling process.
 
-### I/O
+### Memory Allocation
+- `malloc(size)`: Allocates dynamic memory from segregated block pools (up to 256 B).
+- `free(ptr)`: Returns allocated memory to the heap.
+- `SHARE`: Storage class attribute placing global variables in inter-process shared memory.
 
-- `printf(fmt, ...)`: Writes formatted output to UART0.
-- `fprintf(dev, fmt, ...)`: Writes formatted output to a selected character device.
-- `fwrite(dev, buf, len)`: Writes a byte buffer.
-- `fread(dev, buf, len)`: Reads a byte buffer, blocking when RX data is unavailable.
+### Bitwise Hardware I/O (GPIO & LEDs)
+- `pin_mode(dev, pin, mode)`: Configures pin mode (`MODE_INPUT`, `MODE_OUTPUT`).
+- `digital_write(dev, pin, val)`: Sets output pin or LED state (`1` or `0`).
+- `digital_read(dev, pin)`: Reads input pin or button state.
+
+### Character & Line I/O
+- `printf(fmt, ...)`: Formatted print to UART0.
+- `fprintf(dev, fmt, ...)`: Formatted print to a specific character device.
+- `fwrite(dev, buf, len)`: Write raw buffer.
+- `fread(dev, buf, len)`: Read raw buffer (blocks if empty).
 - `fputc()`, `fputs()`, `fputi()`, `fputu()`, `fputx()`: Character, string, and integer output.
-- `gets(buf, siz)` / `fgets(dev, buf, siz)`: Line input with echoing, newline handling, and backspace editing.
-
-Supported format specifiers: `%s`, `%d`, `%i`, `%u`, `%x`, `%c`, and `%%`.
+- `gets(buf, siz)` / `fgets(dev, buf, siz)`: Interactive line input with echo and backspace editing.
 
 ### Timing
-
-- `sleep(ms)`: Sleeps using SysTick.
-- `delay(dev, ms)`: Sleeps using a selected timer.
-- `until(dev, ms)`: Waits for an absolute timer timestamp.
+- `sleep(ms)`: Relative sleep using SysTick.
+- `delay(dev, ms)`: Relative sleep using a selected timer.
+- `until(dev, ms)`: Absolute delay until a specific timestamp.
 
 ### Synchronization
-
-- `sem_new(initial)`: Creates a counting semaphore.
-- `sem_lock(sem)`: Acquires a semaphore token, blocking if necessary.
-- `sem_unlock(sem)`: Releases a semaphore token.
-- `sem_free(sem)`: Frees a semaphore.
-- `mutex_new()`: Creates a mutex.
-- `mutex_lock(mut)`: Acquires a mutex, blocking if necessary.
-- `mutex_unlock(mut)`: Releases a mutex.
-- `mutex_free(mut)`: Frees a mutex.
+- `spin_lock(lock)` / `spin_unlock(lock)`: User-space atomic spinlocks.
+- `sem_new()`, `sem_lock()`, `sem_unlock()`, `sem_free()`: Kernel semaphores.
+- `mutex_new()`, `mutex_lock()`, `mutex_unlock()`, `mutex_free()`: Kernel mutexes.
 
 ### Utilities
-
-- `atoi(s)`: Converts a string to a signed integer.
-- `atou(s)`: Converts a string to an unsigned integer.
+- `atoi(s)`: String to signed integer.
+- `atou(s)`: String to unsigned integer.
 
 ## Getting Started
 
 ### Prerequisites
 
-Install the ARM embedded toolchain, QEMU, Python 3, and GDB.
+Install the ARM embedded toolchain, QEMU, Python 3, and GDB:
 
 **Ubuntu / Debian:**
-
 ```bash
 sudo apt update
 sudo apt install build-essential gcc-arm-none-eabi libnewlib-arm-none-eabi \
@@ -358,14 +364,12 @@ sudo apt install build-essential gcc-arm-none-eabi libnewlib-arm-none-eabi \
 ```
 
 **Arch Linux:**
-
 ```bash
 sudo pacman -S arm-none-eabi-gcc arm-none-eabi-newlib \
                qemu-system-arm gdb python clang
 ```
 
 **macOS:**
-
 ```bash
 brew install --cask gcc-arm-embedded
 brew install qemu python clang-format
@@ -380,24 +384,21 @@ make run   # Run in QEMU
 
 To exit QEMU, press `Ctrl+A`, then `X`.
 
-Secondary UART output is logged to:
-
+Secondary UART logs are written to:
 - UART1: `out/uart1.log`
 - UART2: `out/uart2.log`
 
 ### Debugging with GDB
 
-Start QEMU waiting for a GDB connection:
+1. In one terminal, start QEMU with GDB stub:
+   ```bash
+   make debug
+   ```
 
-```bash
-make debug
-```
-
-Attach GDB from another terminal:
-
-```bash
-make attach
-```
+2. In another terminal, attach GDB:
+   ```bash
+   make attach
+   ```
 
 ### Code Formatting
 
@@ -407,121 +408,126 @@ make format
 
 ## System Call Reference
 
-System calls execute through `svc #IMM`, using `r0-r2` for arguments and returning values in `r0`.
+System calls execute through `svc #IMM`, passing arguments in `r0-r2` and returning values in `r0`.
 
 | ID | Name | User API | Arguments | Return | Description |
 |---|---|---|---|---|---|
-| `1` | `SYS_WRITE` | `fwrite` | `r0`: device, `r1`: buffer, `r2`: length | Bytes written | Writes to a character device. |
-| `2` | `SYS_READ` | `fread` | `r0`: device, `r1`: buffer, `r2`: length | Bytes read | Reads from a character device; may block. |
-| `3` | `SYS_TICK` | `tick` | `r0`: device | Milliseconds | Returns elapsed timer ticks. |
-| `4` | `SYS_DELAY` | `delay` / `sleep` | `r0`: device, `r1`: milliseconds | `0` | Blocks for a relative duration. |
-| `5` | `SYS_UNTIL` | `until` | `r0`: device, `r1`: timestamp | `0` | Blocks until an absolute timestamp. |
-| `6` | `SYS_YIELD` | `yield` | None | `0` | Yields the CPU. |
-| `64` | `SYS_SEM_NEW` | `sem_new` | `r0`: initial tokens | Semaphore handle | Allocates a semaphore. |
-| `65` | `SYS_SEM_LOCK` | `sem_lock` | `r0`: semaphore handle | `0` | Acquires a token or blocks. |
-| `66` | `SYS_SEM_UNLOCK` | `sem_unlock` | `r0`: semaphore handle | `0` | Releases a token or wakes a waiter. |
-| `67` | `SYS_SEM_FREE` | `sem_free` | `r0`: semaphore handle | `0` | Frees a semaphore. |
-| `68` | `SYS_MUTEX_NEW` | `mutex_new` | None | Mutex handle | Allocates a mutex. |
-| `69` | `SYS_MUTEX_LOCK` | `mutex_lock` | `r0`: mutex handle | `0` | Acquires a mutex or blocks. |
-| `70` | `SYS_MUTEX_UNLOCK` | `mutex_unlock` | `r0`: mutex handle | `0` | Releases a mutex if owned by the caller. |
-| `71` | `SYS_MUTEX_FREE` | `mutex_free` | `r0`: mutex handle | `0` | Frees a mutex. |
-| `128` | `SYS_START_PROC` | `start_process` | None | `0` | Starts the initial unprivileged process. |
-| `129` | `SYS_EXIT_PROC` | `terminate` | None | `0` | Terminates the calling process. |
+| `1` | `SYS_WRITE` | `fwrite` | `r0`: dev, `r1`: buf, `r2`: len | Bytes written | Writes to character device. |
+| `2` | `SYS_READ` | `fread` | `r0`: dev, `r1`: buf, `r2`: len | Bytes read | Reads from character device (blocking). |
+| `8` | `SYS_DIGITAL_WRITE` | `digital_write` | `r0`: dev, `r1`: pin, `r2`: val | `0` | Writes to a bitwise pin (GPIO / LED). |
+| `9` | `SYS_DIGITAL_READ` | `digital_read` | `r0`: dev, `r1`: pin | Pin state | Reads from a bitwise pin (GPIO / Button). |
+| `10` | `SYS_PIN_MODE` | `pin_mode` | `r0`: dev, `r1`: pin, `r2`: mode | `0` | Sets pin mode (`MODE_INPUT` / `MODE_OUTPUT`). |
+| `16` | `SYS_TICK` | `tick` | `r0`: dev | Milliseconds | Returns elapsed timer ticks. |
+| `17` | `SYS_DELAY` | `delay` / `sleep` | `r0`: dev, `r1`: ms | `0` | Blocks for a relative duration. |
+| `18` | `SYS_UNTIL` | `until` | `r0`: dev, `r1`: timestamp | `0` | Blocks until an absolute timestamp. |
+| `19` | `SYS_YIELD` | `yield` | None | `0` | Yields CPU to next ready process. |
+| `64` | `SYS_SEM_NEW` | `sem_new` | `r0`: initial tokens | Handle | Allocates a semaphore. |
+| `65` | `SYS_SEM_LOCK` | `sem_lock` | `r0`: handle | `0` | Acquires a token or blocks. |
+| `66` | `SYS_SEM_UNLOCK` | `sem_unlock` | `r0`: handle | `0` | Releases a token or wakes a waiter. |
+| `67` | `SYS_SEM_FREE` | `sem_free` | `r0`: handle | `0` | Frees a semaphore and wakes waiters. |
+| `68` | `SYS_MUTEX_NEW` | `mutex_new` | None | Handle | Allocates an unlocked mutex. |
+| `69` | `SYS_MUTEX_LOCK` | `mutex_lock` | `r0`: handle | `0` | Acquires mutex or blocks. |
+| `70` | `SYS_MUTEX_UNLOCK` | `mutex_unlock` | `r0`: handle | `0` | Releases mutex (owner only). |
+| `71` | `SYS_MUTEX_FREE` | `mutex_free` | `r0`: handle | `0` | Frees a mutex and wakes waiters. |
+| `128` | `SYS_START_PROC` | `start_process` | None | `0` | Starts initial unprivileged process. |
+| `129` | `SYS_EXIT_PROC` | `terminate` | None | `0` | Terminates calling process. |
 
-### Device Identifiers
+### Device Identifiers (`src/syscall.h`)
 
-**Character devices**
-
+#### Character Devices
 | ID | Name | Description |
 |---|---|---|
-| `1` | `SYS_SERIAL0` | Primary UART0 console |
-| `2` | `SYS_SERIAL1` | Secondary UART1 |
-| `3` | `SYS_SERIAL2` | Tertiary UART2 |
+| `1` | `SYS_SERIAL0` | Primary UART0 console (stdio) |
+| `2` | `SYS_SERIAL1` | Secondary UART1 (`out/uart1.log`) |
+| `3` | `SYS_SERIAL2` | Tertiary UART2 (`out/uart2.log`) |
 | `4` | `SYS_SEMIHOST` | ARM semihosting console |
 
-**Timer devices**
-
+#### Bitwise Devices (GPIO & LEDs)
 | ID | Name | Description |
 |---|---|---|
-| `1` | `SYS_SYSTICK` | Core SysTick timer |
+| `0` | `SYS_GPIO0` | CMSDK GPIO Controller 0 (16 pins) |
+| `1` | `SYS_GPIO1` | CMSDK GPIO Controller 1 (16 pins) |
+| `2` | `SYS_GPIO2` | CMSDK GPIO Controller 2 (16 pins) |
+| `3` | `SYS_GPIO3` | CMSDK GPIO Controller 3 (16 pins) |
+| `4` | `SYS_FPGAIO` | MPS2 FPGAIO (LEDs 0-1, Pushbuttons 0-1) |
+
+#### Timer Devices
+| ID | Name | Description |
+|---|---|---|
+| `1` | `SYS_SYSTICK` | Core SysTick timer (default for `sleep`) |
 | `2` | `SYS_TIMER0` | CMSDK APB Timer 0 |
 | `3` | `SYS_TIMER1` | CMSDK APB Timer 1 |
 
 ## Adding a User Process
 
-Create a new C file in `src/user/process/`:
+Create a new C file in `src/user/process/` (e.g., `src/user/process/process_c.c`):
 
 ```c
 #include "../include/lib.h"
 
-PROCESS_PRIORITY(PRIO_HIGH)
-
 int process_c_main(void) {
-    printf("Process C started\n");
-
-    until(SYS_SYSTICK, 2000);
-
-    for (int i = 0; i < 3; i++) {
-        printf("Process C: iteration %d\n", i);
-        sleep(500);
-    }
-
+    printf("Hello from process C!\n");
     yield();
-
-    return 0;
+    
+    return 0; // Triggers SYS_EXIT_PROC automatically
 }
 ```
 
-Then rebuild:
+Then rebuild and run:
 
 ```bash
 make run
 ```
 
-`make_procs.py` discovers the new source file, extracts its priority, assigns a partition, and adds it to the generated process table.
+`make_procs.py` discovers the source file, extracts its priority, assigns an MPU partition, and adds it to the generated process table.
 
 ## Repository Structure
 
 ```text
 .
-├── Makefile
-├── .clang-format
-├── README.md
+├── Makefile                     # Build rules, QEMU runner, GDB targets
+├── .clang-format                # Code formatting configuration (LLVM-based)
+├── README.md                    # Project documentation
 ├── src
-│   ├── syscall.h
-│   ├── kernel
-│   │   ├── kernel.c
-│   │   ├── startup/
-│   │   ├── handler/
-│   │   ├── memory/
-│   │   ├── process/
-│   │   ├── pendsv/
-│   │   ├── syscall/
-│   │   ├── atomic/
-│   │   ├── delay/
-│   │   ├── control/
-│   │   ├── irq/
-│   │   ├── wfi/
-│   │   ├── watchdog/
-│   │   ├── log/
-│   │   ├── driver/
+│   ├── syscall.h                # System call IDs and peripheral device aliases
+│   │
+│   ├── kernel                   # Core Kernel
+│   │   ├── kernel.c             # Kernel initialization, MPU setup, and boot
+│   │   ├── startup/             # Reset handler, ISR vector table, Data/BSS init
+│   │   ├── handler/             # Fault handlers (HardFault, MemManage, Bus, Usage)
+│   │   ├── memory/              # MPU configuration and dynamic partition switching
+│   │   ├── process/             # Multilevel scheduler, runqueues, context_in / context_out
+│   │   ├── pendsv/              # PendSV handler & context switch request
+│   │   ├── syscall/             # SVC handler, syscall table, buffer safety check
+│   │   ├── atomic/              # Synchronization (semaphores, mutexes, ldrex/strex)
+│   │   ├── delay/               # Timer delta queue implementation
+│   │   ├── control/             # CPU privilege register (CONTROL) helpers
+│   │   ├── irq/                 # Interrupt masking (PRIMASK save/restore)
+│   │   ├── wfi/                 # Low-power WFI wrapper
+│   │   ├── watchdog/            # Hardware watchdog driver
+│   │   ├── log/                 # Kernel logger (kprintf, kpanic)
+│   │   ├── driver/              # UART, GPIO, LED/FPGAIO, SysTick, APB timers, Semihost
+│   │   └── include/             # Kernel header definitions (cmsdk.h, driver.h, etc.)
+│   │
+│   ├── user                     # User Space
+│   │   ├── process/             # User applications (idle.c, process_a.c, process_b.c, ...)
+│   │   │   └── process.h        # [Generated] Process table and descriptor headers
+│   │   ├── lib/                 # User-space runtime library
+│   │   │   ├── lib_asm.S        # Syscall assembly wrappers
+│   │   │   ├── heap/            # Segregated-fit heap allocator (malloc, free)
+│   │   │   ├── spinlock/        # Atomic spinlocks (spin_lock, spin_unlock)
+│   │   │   ├── stdio/           # Formatted and line-buffered I/O (printf, gets)
+│   │   │   ├── format/          # Formatted string printers (vformat, lformat)
+│   │   │   └── util/            # Integer parsing (atoi, atou)
 │   │   └── include/
-│   ├── user
-│   │   ├── process/
-│   │   │   └── process.h
-│   │   ├── lib/
-│   │   │   ├── lib_asm.S
-│   │   │   ├── spinlock/
-│   │   │   ├── stdio/
-│   │   │   ├── format/
-│   │   │   └── util/
-│   │   └── include/
-│   │       └── lib.h
-│   └── scripts/
-│       ├── kern_lscript.ld
-│       ├── proc_lscript.ld
-│       └── make_procs.py
-└── out/
+│   │       └── lib.h            # Public user-space library API
+│   │
+│   └── scripts/                 # Build & Tooling
+│       ├── kern_lscript.ld      # Kernel base linker script (Flash, RAM, Heap, Share)
+│       ├── proc_lscript.ld      # [Generated] Process partitions linker script
+│       └── make_procs.py        # Automatic process partition code generator
+│
+└── out/                         # Compilation artifacts and logs
 ```
 
 ## License & Author

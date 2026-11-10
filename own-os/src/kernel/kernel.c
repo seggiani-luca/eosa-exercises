@@ -52,6 +52,15 @@ int kernel_main(void)
                    0,                                       // no executable
                    0                                        // no srd
     );
+    
+	// setup shared MPU region
+    mem_region_set(3,                                         // region 3 (sh.)
+                   (uintptr_t)&_sshare,                       // base of share 
+                   (uintptr_t)&_eshare - (uintptr_t)&_sshare, // size of share 
+                   MPU_AP_RW_RW,                              // full r./write
+                   0,                                         // no executable
+                   0                                          // no srd
+    );
 
     // initialize heaps
     if (heap_init() < 0) { // userspace heap
